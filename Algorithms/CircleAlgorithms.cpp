@@ -1,25 +1,25 @@
 #include "CircleAlgorithms.h"
 
 CircleAlgorithms::CircleAlgorithms() {
- // TODO: Add initialization logic if needed.
+    // TODO: Add initialization logic if needed.
 }
 
-void CircleAlgorithms::drawDirect(const Point& center, int radius) {
-    // TODO: Implement Direct circle algorithm.
+void CircleAlgorithms::drawDirect(HDC hdc, const Point& center, int radius, COLORREF color) {
+    // TODO: Implement Direct circle algorithm using WinAPI/GDI.
 }
 
-void CircleAlgorithms::drawPolar(const Point& center, int radius) {
-    // TODO: Implement Polar circle algorithm.
+void CircleAlgorithms::drawPolar(HDC hdc, const Point& center, int radius, COLORREF color) {
+    // TODO: Implement Polar circle algorithm using WinAPI/GDI.
 }
 
-void CircleAlgorithms::drawIterativePolar(const Point& center, int radius) {
-    // TODO: Implement Iterative Polar circle algorithm.
+void CircleAlgorithms::drawIterativePolar(HDC hdc, const Point& center, int radius, COLORREF color) {
+    // TODO: Implement Iterative Polar circle algorithm using WinAPI/GDI.
 }
 
-void CircleAlgorithms::drawMidpoint(const Point& center, int radius) {
-    // TODO: Implement Midpoint circle algorithm.
+void CircleAlgorithms::drawMidpoint(HDC hdc, const Point& center, int radius, COLORREF color) {
+    // TODO: Implement Midpoint circle algorithm using WinAPI/GDI.
 }
 
-void CircleAlgorithms::drawModifiedMidpoint(const Point& center, int radius) {
-    // TODO: Implement Modified Midpoint circle algorithm.
+void CircleAlgorithms::drawModifiedMidpoint(HDC hdc, const Point& center, int radius, COLORREF color) {
+    // TODO: Implement Modified Midpoint circle algorithm using WinAPI/GDI.
 }

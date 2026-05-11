@@ -2,15 +2,16 @@
 #define ALGORITHMS_ELLIPSE_ALGORITHMS_H
 
 #include "../Utils/Point.h"
+#include <windows.h>
 
 // Groups ellipse drawing algorithm entry points.
 class EllipseAlgorithms {
 public:
     EllipseAlgorithms();
 
-    static void drawDirect(const Point& center, int radiusX, int radiusY);
-    static void drawPolar(const Point& center, int radiusX, int radiusY);
-    static void drawMidpoint(const Point& center, int radiusX, int radiusY);
+    static void drawDirect(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
+    static void drawPolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
+    static void drawMidpoint(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
 };
 
 #endif

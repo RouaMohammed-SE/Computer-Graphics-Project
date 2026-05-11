@@ -9,6 +9,6 @@ Circle::Circle(const Point& center, int radius, CircleAlgorithmType algorithm, c
     // TODO: Add initialization logic if needed.
 }
 
-void Circle::draw() {
-    // TODO: Call selected circle drawing algorithm.
+void Circle::draw(HDC hdc) {
+    // TODO: Call selected circle drawing algorithm using the provided WinAPI HDC.
 }

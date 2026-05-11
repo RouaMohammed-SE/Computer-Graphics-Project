@@ -10,6 +10,6 @@ Ellipse::Ellipse(const Point& center, int radiusX, int radiusY, EllipseAlgorithm
     // TODO: Add initialization logic if needed.
 }
 
-void Ellipse::draw() {
-    // TODO: Call selected ellipse drawing algorithm.
+void Ellipse::draw(HDC hdc) {
+    // TODO: Call selected ellipse drawing algorithm using the provided WinAPI HDC.
 }

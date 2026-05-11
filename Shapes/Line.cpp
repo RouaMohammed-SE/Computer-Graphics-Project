@@ -9,6 +9,6 @@ Line::Line(const Point& start, const Point& end, LineAlgorithmType algorithm, co
     // TODO: Add initialization logic if needed.
 }
 
-void Line::draw() {
-    // TODO: Call selected line drawing algorithm.
+void Line::draw(HDC hdc) {
+    // TODO: Call selected line drawing algorithm using the provided WinAPI HDC.
 }

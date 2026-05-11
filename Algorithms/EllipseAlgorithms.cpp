@@ -4,14 +4,14 @@ EllipseAlgorithms::EllipseAlgorithms() {
     // TODO: Add initialization logic if needed.
 }
 
-void EllipseAlgorithms::drawDirect(const Point& center, int radiusX, int radiusY) {
-    // TODO: Implement Direct ellipse algorithm.
+void EllipseAlgorithms::drawDirect(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+    // TODO: Implement Direct ellipse algorithm using WinAPI/GDI.
 }
 
-void EllipseAlgorithms::drawPolar(const Point& center, int radiusX, int radiusY) {
-    // TODO: Implement Polar ellipse algorithm.
+void EllipseAlgorithms::drawPolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+    // TODO: Implement Polar ellipse algorithm using WinAPI/GDI.
 }
 
-void EllipseAlgorithms::drawMidpoint(const Point& center, int radiusX, int radiusY) {
-    // TODO: Implement Midpoint ellipse algorithm.
+void EllipseAlgorithms::drawMidpoint(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+    // TODO: Implement Midpoint ellipse algorithm using WinAPI/GDI.
 }

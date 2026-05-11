@@ -1,15 +1,17 @@
 #include "Application.h"
 
 Application::Application()
-    : window(),
+    : window(800, 600, Color(255, 255, 255)),
       inputHandler(),
       menu(),
       fileManager(),
       preferences(),
       shapes(),
-      drawingColor(),
-      backgroundColor() {
-    // TODO: Add initialization logic if needed.
+      drawingColor(0, 0, 0),
+      backgroundColor(255, 255, 255) {
+    window.setPaintCallback(Application::handlePaint, this);
+    window.setMouseClickCallback(Application::handleMouseClick, this);
+    window.setMouseMoveCallback(Application::handleMouseMove, this);
 }
 
 Application::~Application() {
@@ -17,15 +19,15 @@ Application::~Application() {
 }
 
 void Application::run() {
-    // TODO: Start application loop.
+    // TODO: Create the WinAPI window and start the message loop.
 }
 
 void Application::update() {
     // TODO: Process input and menu state.
 }
 
-void Application::render() {
-    // TODO: Draw all stored shapes.
+void Application::render(HDC hdc) {
+    // TODO: Draw all stored shapes using the provided WinAPI HDC.
 }
 
 void Application::addShape(Shape* shape) {
@@ -37,9 +39,22 @@ void Application::clearShapes() {
 }
 
 void Application::setDrawingColor(const Color& color) {
-    // TODO: Set active drawing color.
+    drawingColor = color;
 }
 
 void Application::setBackgroundColor(const Color& color) {
-    // TODO: Set active background color.
+    backgroundColor = color;
+    window.setBackgroundColor(color);
+}
+
+void Application::handlePaint(HDC hdc, void* context) {
+    // TODO: Forward WinAPI paint events to the application renderer.
+}
+
+void Application::handleMouseClick(const Point& position, void* context) {
+    // TODO: Forward WinAPI mouse clicks to the input handler.
+}
+
+void Application::handleMouseMove(const Point& position, void* context) {
+    // TODO: Forward WinAPI mouse movement to the input handler.
 }

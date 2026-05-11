@@ -11,7 +11,7 @@ public:
     Ellipse();
     Ellipse(const Point& center, int radiusX, int radiusY, EllipseAlgorithmType algorithm, const Color& color);
 
-    void draw() override;
+    void draw(HDC hdc) override;
 
 private:
     Point center;

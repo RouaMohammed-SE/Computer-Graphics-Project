@@ -9,6 +9,6 @@ Curve::Curve(const std::vector<Point>& controlPoints, double tension, const Colo
     // TODO: Add initialization logic if needed.
 }
 
-void Curve::draw() {
-    // TODO: Call curve drawing algorithm.
+void Curve::draw(HDC hdc) {
+    // TODO: Call curve drawing algorithm using the provided WinAPI HDC.
 }

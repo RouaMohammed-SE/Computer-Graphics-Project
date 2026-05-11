@@ -2,6 +2,7 @@
 #define SHAPES_SHAPE_H
 
 #include "../Utils/Color.h"
+#include <windows.h>
 
 // Abstract base class for every drawable shape in the application.
 class Shape {
@@ -10,7 +11,7 @@ public:
     explicit Shape(const Color& color);
     virtual ~Shape();
 
-    virtual void draw() = 0;
+    virtual void draw(HDC hdc) = 0;
     Color getColor() const;
     void setColor(const Color& color);
 

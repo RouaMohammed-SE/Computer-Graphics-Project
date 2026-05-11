@@ -9,22 +9,21 @@ Menu::Menu()
 }
 
 void Menu::setMode(DrawingMode mode) {
-    // TODO: Store selected mode.
+    currentMode = mode;
 }
 
 DrawingMode Menu::getMode() const {
-    // TODO: Return selected mode.
-    return DrawingMode::None;
+    return currentMode;
 }
 
 void Menu::setLineAlgorithm(LineAlgorithmType algorithm) {
-    // TODO: Store selected line algorithm.
+    lineAlgorithm = algorithm;
 }
 
 void Menu::setCircleAlgorithm(CircleAlgorithmType algorithm) {
-    // TODO: Store selected circle algorithm.
+    circleAlgorithm = algorithm;
 }
 
 void Menu::setEllipseAlgorithm(EllipseAlgorithmType algorithm) {
-    // TODO: Store selected ellipse algorithm.
+    ellipseAlgorithm = algorithm;
 }

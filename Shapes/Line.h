@@ -11,7 +11,7 @@ public:
     Line();
     Line(const Point& start, const Point& end, LineAlgorithmType algorithm, const Color& color);
 
-    void draw() override;
+    void draw(HDC hdc) override;
 
 private:
     Point start;

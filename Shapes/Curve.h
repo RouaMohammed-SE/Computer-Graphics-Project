@@ -11,7 +11,7 @@ public:
     Curve();
     Curve(const std::vector<Point>& controlPoints, double tension, const Color& color);
 
-    void draw() override;
+    void draw(HDC hdc) override;
 
 private:
     std::vector<Point> controlPoints;

@@ -18,13 +18,17 @@ public:
 
     void run();
     void update();
-    void render();
+    void render(HDC hdc);
     void addShape(Shape* shape);
     void clearShapes();
     void setDrawingColor(const Color& color);
     void setBackgroundColor(const Color& color);
 
 private:
+    static void handlePaint(HDC hdc, void* context);
+    static void handleMouseClick(const Point& position, void* context);
+    static void handleMouseMove(const Point& position, void* context);
+
     Window window;
     InputHandler inputHandler;
     Menu menu;

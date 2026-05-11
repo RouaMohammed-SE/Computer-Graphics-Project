@@ -11,7 +11,7 @@ public:
     Circle();
     Circle(const Point& center, int radius, CircleAlgorithmType algorithm, const Color& color);
 
-    void draw() override;
+    void draw(HDC hdc) override;
 
 private:
     Point center;
