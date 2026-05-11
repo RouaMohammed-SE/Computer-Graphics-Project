@@ -10,7 +10,7 @@ class CurveAlgorithms {
 public:
     CurveAlgorithms();
 
-    static void drawCardinalSpline(HDC hdc, const std::vector<Point>& controlPoints, double tension, COLORREF color);
+    static void drawCardinalSpline(HDC hdc, const std::vector<Point>& points, double tension, COLORREF color);
 };
 
 #endif
