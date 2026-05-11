@@ -1,33 +1,36 @@
 #include "Preferences.h"
 
 Preferences::Preferences()
-    : backgroundColor(), drawingColor(), mouseCursor(MouseCursorType::Default) {
-    // TODO: Add initialization logic if needed.
-}
+    : backgroundColor(255, 255, 255),
+      drawingColor(0, 0, 0),
+      mouseCursor(MouseCursorType::Default) {}
 
 void Preferences::setBackgroundColor(const Color& color) {
-    // TODO: Store background color preference.
+    // Store background color preference.
+    backgroundColor = color;
 }
 
 void Preferences::setDrawingColor(const Color& color) {
-    // TODO: Store drawing color preference.
+    // Store drawing color preference.
+    drawingColor = color;
 }
 
 void Preferences::setMouseCursor(MouseCursorType cursorType) {
-    // TODO: Store mouse cursor preference.
+    // Store mouse cursor preference.
+    mouseCursor = cursorType;
 }
 
 Color Preferences::getBackgroundColor() const {
-    // TODO: Return background color preference.
-    return Color();
+    // Return background color preference.
+    return backgroundColor;
 }
 
 Color Preferences::getDrawingColor() const {
-    // TODO: Return drawing color preference.
-    return Color();
+    // Return drawing color preference.
+    return drawingColor;
 }
 
 MouseCursorType Preferences::getMouseCursor() const {
-    // TODO: Return mouse cursor preference.
-    return MouseCursorType::Default;
+    // Return mouse cursor preference.
+    return mouseCursor;
 }

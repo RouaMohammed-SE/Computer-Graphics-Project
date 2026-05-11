@@ -12,6 +12,8 @@ public:
     Line(const Point& start, const Point& end, LineAlgorithmType algorithm, const Color& color);
 
     void draw(HDC hdc) override;
+    // Returns a text representation of the line for saving to a file.
+    std::string serialize() const override;
 
 private:
     Point start;
