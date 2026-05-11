@@ -7,7 +7,7 @@
       "command": "powershell",
       "args": [
         "-Command",
-        "g++ (Get-ChildItem -Recurse -Filter *.cpp | Where-Object { $_.Name -ne 'main.cpp' } | ForEach-Object { $_.FullName }) main.cpp -o main.exe -lgdi32 -luser32"
+        "g++ (Get-ChildItem -Recurse -Filter *.cpp | Where-Object { $_.Name -ne 'main.cpp' -and $_.Name -ne 'FillingCircles.cpp' } | ForEach-Object { $_.FullName }) main.cpp -o main.exe -lgdi32 -luser32"
       ],
       "group": {
         "kind": "build",
