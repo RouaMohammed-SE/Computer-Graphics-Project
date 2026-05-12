@@ -136,7 +136,7 @@ void bezierCurve(HDC hdc, Point& p1, Point& p2, Point& p3, Point& p4, COLORREF c
     }
 }
 
-void FillAlgorithms::fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, const Color& fillColor) {
+void FillAlgorithms::fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, COLORREF fillColor) {
     int left = topLeft.x, top = topLeft.y;
     int right = bottomRight.x, bottom = bottomRight.y;
     int width = right - left;
@@ -175,7 +175,7 @@ void hermiteCurve1(HDC hdc, Point& p1, Point& s1, Point& p2, Point& s2, COLORREF
     }
 }
 
-void FillAlgorithms::fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, const Color& fillColor) {
+void FillAlgorithms::fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, COLORREF fillColor) {
     int left = topLeft.x, top = topLeft.y;
     int right = topLeft.x + sideLength, bottom = topLeft.y + sideLength;
     double tangentMag = sideLength * 0.8;

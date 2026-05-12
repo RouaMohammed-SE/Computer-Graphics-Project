@@ -21,8 +21,8 @@ public:
         int quarter,
         const Color& startColor,
         const Color& endColor);
-    static void fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, const Color& fillColor);
-    static void fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, const Color& fillColor);
+    static void fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, COLORREF fillColor);
+    static void fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, COLORREF fillColor);
 };
 
 #endif

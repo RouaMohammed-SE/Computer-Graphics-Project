@@ -1,5 +1,6 @@
 #include "Clipper.h"
 #include <windows.h>
+#include <cmath>
 
 Clipper::Clipper() {
     // TODO: Add initialization logic if needed.
