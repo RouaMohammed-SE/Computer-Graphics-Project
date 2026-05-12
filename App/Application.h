@@ -8,6 +8,7 @@
 #include "../Menu/Menu.h"
 #include "../Shapes/Shape.h"
 #include "../Utils/Color.h"
+#include "../Utils/Logger.h"
 #include <vector>
 
 // Main controller that coordinates window, input, menu, files, and shapes.
@@ -24,16 +25,22 @@ public:
     void setDrawingColor(const Color& color);
     void setBackgroundColor(const Color& color);
 
+    Color getDrawingColor() const { return drawingColor; }
+
 private:
     static void handlePaint(HDC hdc, void* context);
     static void handleMouseClick(const Point& position, void* context);
     static void handleMouseMove(const Point& position, void* context);
+    // Called by Window whenever a menu item is clicked (WM_COMMAND)
+    static void handleCommand    (int commandId, void* context);
 
     Window window;
     InputHandler inputHandler;
     Menu menu;
     FileManager fileManager;
     Preferences preferences;
+    Logger logger;
+
     std::vector<Shape*> shapes;
     Color drawingColor;
     Color backgroundColor;
