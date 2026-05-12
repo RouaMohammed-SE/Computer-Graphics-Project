@@ -2,6 +2,11 @@
 #define FILESYSTEM_FILE_MANAGER_H
 
 #include "../Shapes/Shape.h"
+#include "../Shapes/Line.h"
+#include "../Shapes/Circle.h"
+#include "../Shapes/Ellipse.h"
+#include "../Shapes/Curve.h"
+#include "../Core/Enums.h"
 #include <string>
 #include <vector>
 

@@ -7,10 +7,10 @@
 #include <string>
 
 // Drawable ellipse shape configured with a selected ellipse algorithm.
-class Ellipse : public Shape {
+class MyEllipse : public Shape {
 public:
-    Ellipse();
-    Ellipse(const Point& center, int radiusX, int radiusY, EllipseAlgorithmType algorithm, const Color& color);
+    MyEllipse();
+    MyEllipse(const Point& center, int radiusX, int radiusY, EllipseAlgorithmType algorithm, const Color& color);
 
     void draw(HDC hdc) override;
 
