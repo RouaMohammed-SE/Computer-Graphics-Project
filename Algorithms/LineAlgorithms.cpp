@@ -1,5 +1,9 @@
 #include "LineAlgorithms.h"
 #include <windows.h>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
 
 LineAlgorithms::LineAlgorithms() {
     // TODO: Add initialization logic if needed.

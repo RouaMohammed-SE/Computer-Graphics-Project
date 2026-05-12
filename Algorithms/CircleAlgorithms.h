@@ -6,8 +6,6 @@
 
 // Groups circle drawing algorithm entry points.
 class CircleAlgorithms {
-private:
-	void draw8Points(HDC hdc, Point& center, Point& p, COLORREF color);
 public:
     CircleAlgorithms();
 

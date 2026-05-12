@@ -1,11 +1,15 @@
 #include "CurveAlgorithms.h"
 #include <windows.h>
+#include <cmath>
+#include <vector>
+
+using namespace std;
 
 CurveAlgorithms::CurveAlgorithms() {
     // TODO: Add initialization logic if needed.
 }
 
-void hermiteCurve(HDC hdc, Point& p1, Point& s1, Point& p2, Point& s2, COLORREF color) {
+void hermiteCurve(HDC hdc, const Point& p1, const Point& s1, const Point& p2, const Point& s2, COLORREF color) {
     int H[][4] = {{2, 1, -2, 1}, {-3, -2, 3, -1}, {0, 1, 0, 0}, {1, 0, 0, 0}};
     int a3 = H[0][0]*p1.x + H[0][1]*s1.x + H[0][2]*p2.x + H[0][3]*s2.x;
     int a2 = H[1][0]*p1.x + H[1][1]*s1.x + H[1][2]*p2.x + H[1][3]*s2.x;
@@ -29,10 +33,10 @@ void CurveAlgorithms::drawCardinalSpline(HDC hdc, const std::vector<Point>& poin
     int n = points.size();
     vector<Point> tangents(n);
     for (int i = 1; i < n-1; i++) {
-        tangents[i] = {tension * (points[i+1].x - points[i-1].x), tension * (points[i+1].y - points[i-1].y)};
+        tangents[i] = Point(tension * (points[i+1].x - points[i-1].x), tension * (points[i+1].y - points[i-1].y));
     }
-    tangents[0] = {tension * (points[1].x - points[0].x), tension * (points[1].y - points[0].y)};
-    tangents[n-1] = {tension * (points[n-1].x - points[n-2].x), tension * (points[n-1].y - points[n-2].y)};
+    tangents[0] = Point(tension * (points[1].x - points[0].x), tension * (points[1].y - points[0].y));
+    tangents[n-1] = Point(tension * (points[n-1].x - points[n-2].x), tension * (points[n-1].y - points[n-2].y));
     for (int i = 0; i < n-1; i++) {
         hermiteCurve(hdc, points[i], tangents[i], points[i+1], tangents[i+1], color);
     }

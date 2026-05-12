@@ -3,6 +3,7 @@
 #include <commdlg.h>
 #include <iostream>
 
+
 Application::Application()
     : window(800, 600, Color(255, 255, 255)),
       inputHandler(),

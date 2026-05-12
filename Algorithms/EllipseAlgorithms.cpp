@@ -1,5 +1,9 @@
 #include "EllipseAlgorithms.h"
 #include <windows.h>
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
 
 EllipseAlgorithms::EllipseAlgorithms() {
     // TODO: Add initialization logic if needed.
@@ -18,12 +22,12 @@ void EllipseAlgorithms::drawDirect(HDC hdc, const Point& center, int radiusX, in
     draw4Points(hdc, xc, yc, x, y, c);
     while (x > y) { // abs(slope) > 1 --> y independent
         y++;
-        x = (double) radiusX * sqrt(1.0 - (double) (y*y) / (B*B));
+        x = (double) radiusX * sqrt(1.0 - (double) (y*y) / (radiusY*radiusY));
         draw4Points(hdc, xc, yc, round(x), y, c);
     }
     while (y >= x) {
         x--;
-        y = (double) radiusY * sqrt(1.0 - (double) (x*x) / (A*A));
+        y = (double) radiusY * sqrt(1.0 - (double) (x*x) / (radiusX*radiusX));
         draw4Points(hdc, xc, yc, round(x), y, c);
     }
 }

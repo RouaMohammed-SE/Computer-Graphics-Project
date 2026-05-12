@@ -1,16 +1,18 @@
 #include "CircleAlgorithms.h"
 #include <windows.h>
+#include <cmath>
 
-void CircleAlgorithms:: draw8Points(HDC hdc, Point& center, Point& p, COLORREF c) {
-	int xc = center.x, yc = center.y, x = p.x, y = p.y;
-    SetPixel(hdc, xc+x, yc+y, c);
-    SetPixel(hdc, xc-x, yc+y, c);
-    SetPixel(hdc, xc-x, yc-y, c);
-    SetPixel(hdc, xc+x, yc-y, c);
-    SetPixel(hdc, xc+y, yc+x, c);
-    SetPixel(hdc, xc-y, yc+x, c);
-    SetPixel(hdc, xc-y, yc-x, c);
-    SetPixel(hdc, xc+y, yc-x, c);
+using namespace std;
+
+static void draw8Points(HDC hdc, int xc, int yc, int x, int y, COLORREF color) {
+    SetPixel(hdc, xc+x, yc+y, color);
+    SetPixel(hdc, xc-x, yc+y, color);
+    SetPixel(hdc, xc-x, yc-y, color);
+    SetPixel(hdc, xc+x, yc-y, color);
+    SetPixel(hdc, xc+y, yc+x, color);
+    SetPixel(hdc, xc-y, yc+x, color);
+    SetPixel(hdc, xc-y, yc-x, color);
+    SetPixel(hdc, xc+y, yc-x, color);
 }
 
 CircleAlgorithms::CircleAlgorithms() {
@@ -20,11 +22,11 @@ CircleAlgorithms::CircleAlgorithms() {
 void CircleAlgorithms::drawDirect(HDC hdc, const Point& center, int radius, COLORREF color) {
     int xc = center.x, yc = center.y;
     int x = 0, y = radius;
-    draw8Points(hdc, xc, yc, x, y, c);
+    draw8Points(hdc, xc, yc, x, y, color);
     while (x < y) {
         x++;
         y = sqrt((double) radius*radius - x*x);
-        draw8Points(hdc, xc, yc, x, y, c);
+        draw8Points(hdc, xc, yc, x, y, color);
     }
 }
 
@@ -32,7 +34,7 @@ void CircleAlgorithms::drawPolar(HDC hdc, const Point& center, int radius, COLOR
     int xc = center.x, yc = center.y;
     double dtheta = 1.0/radius, theta = 0;
     double x = radius, y = 0;
-    draw8Points(hdc, xc+x, yc+y, x, y, color);
+    draw8Points(hdc, xc, yc, x, y, color);
     while (x > y) {
         theta += dtheta;
         x = radius * cos(theta);
