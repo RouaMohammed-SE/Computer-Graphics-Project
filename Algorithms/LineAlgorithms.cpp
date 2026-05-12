@@ -72,5 +72,9 @@ void LineAlgorithms::drawMidpoint(HDC hdc, const Point& start, const Point& end,
 }
 
 void LineAlgorithms::drawParametric(HDC hdc, const Point& start, const Point& end, COLORREF color) {
-    // TODO: Implement Parametric line algorithm using WinAPI/GDI.
+    for (double t = 0; t < 1; t += 0.0001) {
+        double x = (end.x - start.x) * t + start.x;
+        double y = (end.y - start.y) * t + start.y;
+        SetPixel(hdc, round(x), round(y), color);
+    }
 }
