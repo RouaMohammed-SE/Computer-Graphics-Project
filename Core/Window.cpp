@@ -47,13 +47,13 @@ bool Window::create(const wchar_t* title) {
 
     if (!RegisterClassEx(&wc)) return false;
 
-    // ── File Menu
+    // File Menu
     HMENU hFileMenu = CreatePopupMenu();
     AppendMenu(hFileMenu, MF_STRING, IDM_FILE_CLEAR, L"Clear Screen");
     AppendMenu(hFileMenu, MF_STRING, IDM_FILE_SAVE,  L"Save...");
     AppendMenu(hFileMenu, MF_STRING, IDM_FILE_LOAD,  L"Load...");
 
-    // ── Preferences Menu
+    // Preferences Menu
     HMENU hCursorMenu = CreatePopupMenu();
     AppendMenu(hCursorMenu, MF_STRING, IDM_PREF_CURSOR_DEFAULT,    L"Default");
     AppendMenu(hCursorMenu, MF_STRING, IDM_PREF_CURSOR_CROSSHAIR,  L"Crosshair");
@@ -64,7 +64,7 @@ bool Window::create(const wchar_t* title) {
     AppendMenu(hPrefMenu, MF_POPUP, (UINT_PTR)hCursorMenu, L"Mouse Cursor");
     AppendMenu(hPrefMenu, MF_STRING, IDM_PREF_COLOR, L"Shape Color...");
 
-        // ── Menu Bar ───────────────────────────────────────────────
+    // Menu Bar 
     HMENU hMenuBar = CreateMenu();
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFileMenu, L"File");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hPrefMenu, L"Preferences");
@@ -112,6 +112,11 @@ void Window::refresh() {
 
 void Window::setBackgroundColor(const Color& color) {
     backgroundColor = color;
+}
+
+void Window::setCursor(HCURSOR hCursor) {
+    currentCursor = hCursor;
+    SetCursor(hCursor);
 }
 
 void Window::setPaintCallback(PaintCallback callback, void* context) {
