@@ -16,7 +16,7 @@ void draw4Points(HDC hdc, int xc, int yc, int x, int y, COLORREF c) {
     SetPixel(hdc, xc+x, yc-y, c);
 }
 
-void EllipseAlgorithms::drawDirect(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+void EllipseAlgorithms::drawDirect(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF c) {
     int xc = center.x, yc = center.y;
     double x = radiusX, y = 0;
     draw4Points(hdc, xc, yc, x, y, c);
@@ -32,7 +32,7 @@ void EllipseAlgorithms::drawDirect(HDC hdc, const Point& center, int radiusX, in
     }
 }
 
-void EllipseAlgorithms::drawPolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+void EllipseAlgorithms::drawPolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF c) {
     int xc = center.x, yc = center.y;
     double dtheta = 1.0/max(radiusX, radiusY), theta = 0;
     double x = radiusX, y = 0;
@@ -45,7 +45,7 @@ void EllipseAlgorithms::drawPolar(HDC hdc, const Point& center, int radiusX, int
     }
 }
 
-void EllipseAlgorithms::drawIterativePolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+void EllipseAlgorithms::drawIterativePolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF c) {
     int xc = center.x, yc = center.y;
     int A = radiusX, B = radiusY;
     double dtheta = 1.0/max(A, B), costheta = cos(dtheta), sintheta = sin(dtheta);
@@ -60,7 +60,7 @@ void EllipseAlgorithms::drawIterativePolar(HDC hdc, const Point& center, int rad
     }
 }
 
-void EllipseAlgorithms::drawMidpoint(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color) {
+void EllipseAlgorithms::drawMidpoint(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF c) {
     int xc = center.x, yc = center.y;
     int A = radiusX, B = radiusY;
     int x = 0, y = B;
