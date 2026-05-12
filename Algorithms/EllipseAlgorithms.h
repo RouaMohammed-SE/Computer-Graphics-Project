@@ -11,6 +11,7 @@ public:
 
     static void drawDirect(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
     static void drawPolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
+    static void drawIterativePolar(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
     static void drawMidpoint(HDC hdc, const Point& center, int radiusX, int radiusY, COLORREF color);
 };
 
