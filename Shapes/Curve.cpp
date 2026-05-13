@@ -1,5 +1,12 @@
 #include "Curve.h"
+#include "../Algorithms/CurveAlgorithms.h"
 #include <string>
+
+namespace {
+COLORREF toColorRef(const Color& color) {
+    return RGB(color.r, color.g, color.b);
+}
+}
 Curve::Curve() : Shape(), controlPoints(), tension(0.0) {
     // TODO: Add initialization logic if needed.
 }
@@ -10,7 +17,7 @@ Curve::Curve(const std::vector<Point>& controlPoints, double tension, const Colo
 }
 
 void Curve::draw(HDC hdc) {
-    // TODO: Call curve drawing algorithm using the provided WinAPI HDC.
+    CurveAlgorithms::drawCardinalSpline(hdc, controlPoints, tension, toColorRef(color));
 }
 
 // Returns a text representation of the curve for saving to a file. 

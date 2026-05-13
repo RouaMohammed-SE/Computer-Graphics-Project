@@ -53,5 +53,6 @@
 #define IDM_CLIPPING_CIRCLE_POINT       1127
 #define IDM_CLIPPING_CIRCLE_LINE        1128
 
-#define IDM_SMILEY_FACE                 1129
+#define IDM_SMILEY_FACE_HAPPY           1129
+#define IDM_SMILEY_FACE_SAD             1130
 #endif

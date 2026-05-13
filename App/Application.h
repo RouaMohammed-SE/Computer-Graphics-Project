@@ -10,6 +10,8 @@
 #include "../Shapes/Shape.h"
 #include "../Utils/Color.h"
 #include "../Utils/Logger.h"
+#include "../Utils/Point.h"
+#include <windows.h>
 #include <vector>
 
 // Main controller that coordinates window, input, menu, files, and shapes.
@@ -34,6 +36,8 @@ private:
     static void handleMouseMove(const Point& position, void* context);
     // Called by Window whenever a menu item is clicked (WM_COMMAND)
     static void handleCommand    (int commandId, void* context);
+
+    void addSmileyFace(bool happy);
 
     Window window;
     InputHandler inputHandler;

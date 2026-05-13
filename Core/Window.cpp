@@ -128,9 +128,14 @@ bool Window::create(const wchar_t* title) {
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hCircleMenu,  L"Circle");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hEllipseMenu, L"Ellipse");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hCurveMenu,   L"Curves");
+    // Smiley Face Menu
+    HMENU hSmileyMenu = CreatePopupMenu();
+    AppendMenu(hSmileyMenu, MF_STRING, IDM_SMILEY_FACE_HAPPY, L"Happy Face");
+    AppendMenu(hSmileyMenu, MF_STRING, IDM_SMILEY_FACE_SAD,   L"Sad Face");
+
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFillMenu,    L"Filling");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hClipMenu, L"Clipping");
-    AppendMenu(hMenuBar, MF_STRING, IDM_SMILEY_FACE,       L"Smiley Face");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hSmileyMenu,  L"Smiley Face");
 
     // Pass 'this' as lpCreateParams so WM_NCCREATE can store the pointer
     handle = CreateWindowEx(

@@ -1,4 +1,11 @@
 #include "Circle.h"
+#include "../Algorithms/CircleAlgorithms.h"
+
+namespace {
+COLORREF toColorRef(const Color& color) {
+    return RGB(color.r, color.g, color.b);
+}
+}
 
 Circle::Circle() : Shape(), center(), radius(0), algorithm(CircleAlgorithmType::Midpoint) {
     // TODO: Add initialization logic if needed.
@@ -10,7 +17,23 @@ Circle::Circle(const Point& center, int radius, CircleAlgorithmType algorithm, c
 }
 
 void Circle::draw(HDC hdc) {
-    // TODO: Call selected circle drawing algorithm using the provided WinAPI HDC.
+    switch (algorithm) {
+    case CircleAlgorithmType::Direct:
+        CircleAlgorithms::drawDirect(hdc, center, radius, toColorRef(color));
+        break;
+    case CircleAlgorithmType::Polar:
+        CircleAlgorithms::drawPolar(hdc, center, radius, toColorRef(color));
+        break;
+    case CircleAlgorithmType::IterativePolar:
+        CircleAlgorithms::drawIterativePolar(hdc, center, radius, toColorRef(color));
+        break;
+    case CircleAlgorithmType::Midpoint:
+        CircleAlgorithms::drawMidpoint(hdc, center, radius, toColorRef(color));
+        break;
+    case CircleAlgorithmType::ModifiedMidpoint:
+        CircleAlgorithms::drawModifiedMidpoint(hdc, center, radius, toColorRef(color));
+        break;
+    }
 }
 
 // Returns a text representation of the circle for saving to a file.

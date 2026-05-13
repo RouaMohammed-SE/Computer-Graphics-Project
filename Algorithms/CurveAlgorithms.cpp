@@ -31,6 +31,10 @@ void hermiteCurve(HDC hdc, const Point& p1, const Point& s1, const Point& p2, co
 
 void CurveAlgorithms::drawCardinalSpline(HDC hdc, const std::vector<Point>& points, double tension, COLORREF color) {
     int n = points.size();
+    if (n < 2) {
+        return;
+    }
+
     vector<Point> tangents(n);
     for (int i = 1; i < n-1; i++) {
         tangents[i] = Point(tension * (points[i+1].x - points[i-1].x), tension * (points[i+1].y - points[i-1].y));

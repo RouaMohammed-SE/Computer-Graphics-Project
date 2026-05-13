@@ -7,6 +7,9 @@
 #include "../Filling/FillAlgorithms.h"
 #include "../Clipping/Clipper.h"
 #include "../Core/Enums.h"
+#include "../Shapes/Circle.h"
+#include "../Shapes/Curve.h"
+#include "../Shapes/Line.h"
 #include <commdlg.h>
 #include <iostream>
 #include <cmath>
@@ -88,6 +91,44 @@ void Application::setBackgroundColor(const Color& color) {
     backgroundColor = color;
     preferences.setBackgroundColor(color);
     window.setBackgroundColor(color);
+}
+
+void Application::addSmileyFace(bool happy) {
+    const Color faceColor = drawingColor;
+    const Point center(400, 280);
+    const int faceRadius = 120;
+
+    addShape(new Circle(center, faceRadius, CircleAlgorithmType::Midpoint, faceColor));
+    addShape(new Circle(Point(center.x - 45, center.y - 35), 16, CircleAlgorithmType::Midpoint, faceColor));
+    addShape(new Circle(Point(center.x + 45, center.y - 35), 16, CircleAlgorithmType::Midpoint, faceColor));
+
+    addShape(new Line(
+        Point(center.x, center.y - 10),
+        Point(center.x - 15, center.y + 35),
+        LineAlgorithmType::Midpoint,
+        faceColor));
+    addShape(new Line(
+        Point(center.x - 15, center.y + 35),
+        Point(center.x + 15, center.y + 35),
+        LineAlgorithmType::Midpoint,
+        faceColor));
+
+    std::vector<Point> mouthPoints;
+    if (happy) {
+        mouthPoints.push_back(Point(center.x - 55, center.y + 45));
+        mouthPoints.push_back(Point(center.x - 25, center.y + 75));
+        mouthPoints.push_back(Point(center.x + 25, center.y + 75));
+        mouthPoints.push_back(Point(center.x + 55, center.y + 45));
+    } else {
+        mouthPoints.push_back(Point(center.x - 55, center.y + 80));
+        mouthPoints.push_back(Point(center.x - 25, center.y + 50));
+        mouthPoints.push_back(Point(center.x + 25, center.y + 50));
+        mouthPoints.push_back(Point(center.x + 55, center.y + 80));
+    }
+    addShape(new Curve(mouthPoints, 0.5, faceColor));
+
+    window.refresh();
+    logger.log(happy ? "Happy face drawn." : "Sad face drawn.");
 }
 
 void Application::handlePaint(HDC hdc, void* context) {
@@ -286,6 +327,14 @@ void Application::handleCommand(int commandId, void* context) {
             app->menu.setClippingType(ClippingType::Circle);
             app->menu.setClipAlgorithm(ClipAlgorithmType::LineClip);
             app->logger.log("Circle-Line Clip: click center and a point on the boundary of circle window, then line start and end of the line to be clipped.");
+            break;
+
+        case IDM_SMILEY_FACE_HAPPY:
+            app->addSmileyFace(true);
+            break;
+
+        case IDM_SMILEY_FACE_SAD:
+            app->addSmileyFace(false);
             break;
 
         default:
