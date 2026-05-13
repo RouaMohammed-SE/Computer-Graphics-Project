@@ -135,6 +135,79 @@ void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& draw
         case PersistentDrawingType::SquareFillWithCurves:
             FillAlgorithms::fillSquareWithCurves(hdc, drawing.points[0], drawing.sideLength, color);
             break;
+        case PersistentDrawingType::RectangleClipPoint: {
+            Point tl = drawing.points[0];
+            Point br = drawing.points[1];
+            Point pt = drawing.points[2];
+            COLORREF black = RGB(0, 0, 0);
+            LineAlgorithms::drawDDA(hdc, tl, Point(br.x, tl.y), black);
+            LineAlgorithms::drawDDA(hdc, Point(br.x, tl.y), br,  black);
+            LineAlgorithms::drawDDA(hdc, br, Point(tl.x, br.y),  black);
+            LineAlgorithms::drawDDA(hdc, Point(tl.x, br.y), tl,  black);
+            Clipper clipper;
+            clipper.rectanglePointClipping(hdc, tl, br, pt, color);
+            break;
+        }
+        case PersistentDrawingType::RectangleClipLine: {
+            Point tl    = drawing.points[0];
+            Point br    = drawing.points[1];
+            Point lp1   = drawing.points[2];
+            Point lp2   = drawing.points[3];
+            COLORREF black = RGB(0, 0, 0);
+            LineAlgorithms::drawDDA(hdc, tl, Point(br.x, tl.y), black);
+            LineAlgorithms::drawDDA(hdc, Point(br.x, tl.y), br,  black);
+            LineAlgorithms::drawDDA(hdc, br, Point(tl.x, br.y),  black);
+            LineAlgorithms::drawDDA(hdc, Point(tl.x, br.y), tl,  black);
+            Clipper clipper;
+            clipper.rectangleLineClipping(hdc, tl, br, lp1, lp2, color);
+            break;
+        }
+        case PersistentDrawingType::RectangleClipPolygon: {
+            Point tl = drawing.points[0];
+            Point br = drawing.points[1];
+            COLORREF black = RGB(0, 0, 0);
+            LineAlgorithms::drawDDA(hdc, tl, Point(br.x, tl.y), black);
+            LineAlgorithms::drawDDA(hdc, Point(br.x, tl.y), br,  black);
+            LineAlgorithms::drawDDA(hdc, br, Point(tl.x, br.y),  black);
+            LineAlgorithms::drawDDA(hdc, Point(tl.x, br.y), tl,  black);
+            Clipper clipper;
+            clipper.rectanglePolygonClipping(hdc, tl, br,
+                const_cast<std::vector<Point>&>(drawing.polygonPoints));
+            break;
+        }
+        case PersistentDrawingType::SquareClipPoint: {
+            Point tl  = drawing.points[0];
+            Point pt  = drawing.points[1];
+            int   side = drawing.sideLength;
+            COLORREF black = RGB(0, 0, 0);
+            Point tr(tl.x + side, tl.y);
+            Point br(tl.x + side, tl.y + side);
+            Point bl(tl.x,        tl.y + side);
+            LineAlgorithms::drawDDA(hdc, tl, tr, black);
+            LineAlgorithms::drawDDA(hdc, tr, br, black);
+            LineAlgorithms::drawDDA(hdc, br, bl, black);
+            LineAlgorithms::drawDDA(hdc, bl, tl, black);
+            Clipper clipper;
+            clipper.squarePointClipping(hdc, tl, side, pt, color);
+            break;
+        }
+        case PersistentDrawingType::SquareClipLine: {
+            Point tl  = drawing.points[0];
+            Point lp1 = drawing.points[1];
+            Point lp2 = drawing.points[2];
+            int   side = drawing.sideLength;
+            COLORREF black = RGB(0, 0, 0);
+            Point tr(tl.x + side, tl.y);
+            Point br(tl.x + side, tl.y + side);
+            Point bl(tl.x,        tl.y + side);
+            LineAlgorithms::drawDDA(hdc, tl, tr, black);
+            LineAlgorithms::drawDDA(hdc, tr, br, black);
+            LineAlgorithms::drawDDA(hdc, br, bl, black);
+            LineAlgorithms::drawDDA(hdc, bl, tl, black);
+            Clipper clipper;
+            clipper.squareLineClipping(hdc, tl, side, lp1, lp2, color);
+            break;
+        }
         case PersistentDrawingType::CircleClipPoint: {
             Point center = drawing.points[0];
             Point point = drawing.points[1];
@@ -618,6 +691,12 @@ void Application::handleMouseClick(const Point& position, void* context) {
                 if (clipAlgo == ClipAlgorithmType::PointClip) {
                     clipper.rectanglePointClipping(hdc, topLeft, bottomRight,
                         const_cast<Point&>(position), color);
+                    app->persistentDrawings.push_back({
+                        PersistentDrawingType::RectangleClipPoint,
+                        {topLeft, bottomRight, position},
+                        0, 0, 0, 0, 0,
+                        app->drawingColor
+                    });
                     app->logger.log("Rectangle-Point clipping done.");
                     clickCount = 0;
                 }
@@ -631,6 +710,12 @@ void Application::handleMouseClick(const Point& position, void* context) {
                         lineP2 = position;
                         clipper.rectangleLineClipping(hdc, topLeft, bottomRight,
                             lineP1, lineP2, color);
+                        app->persistentDrawings.push_back({
+                            PersistentDrawingType::RectangleClipLine,
+                            {topLeft, bottomRight, lineP1, lineP2},
+                            0, 0, 0, 0, 0,
+                            app->drawingColor
+                        });
                         app->logger.log("Rectangle-Line clipping done.");
                         clickCount = 0;
                     }
@@ -647,8 +732,17 @@ void Application::handleMouseClick(const Point& position, void* context) {
                         const Point& last = polygonPoints[n - 1];
                         const Point& secondLast = polygonPoints[n - 2];
                         if (last.x == secondLast.x && last.y == secondLast.y) {
-                            polygonPoints.pop_back(); // remove duplicate
+                            polygonPoints.pop_back();
                             clipper.rectanglePolygonClipping(hdc, topLeft, bottomRight, polygonPoints);
+                            {
+                                PersistentDrawing pd;
+                                pd.type         = PersistentDrawingType::RectangleClipPolygon;
+                                pd.points       = {topLeft, bottomRight};
+                                pd.polygonPoints = polygonPoints;
+                                pd.color        = app->drawingColor;
+                                pd.radius = pd.innerRadius = pd.outerRadius = pd.quarter = pd.sideLength = 0;
+                                app->persistentDrawings.push_back(pd);
+                            }
                             app->logger.log("Rectangle-Polygon clipping done.");
                             polygonPoints.clear();
                             clickCount = 0;
@@ -691,6 +785,12 @@ void Application::handleMouseClick(const Point& position, void* context) {
                 if (clipAlgo == ClipAlgorithmType::PointClip) {
                     clipper.squarePointClipping(hdc, topLeft, sideLength,
                         const_cast<Point&>(position), color);
+                    app->persistentDrawings.push_back({
+                        PersistentDrawingType::SquareClipPoint,
+                        {topLeft, position},
+                        0, 0, 0, 0, sideLength,
+                        app->drawingColor
+                    });
                     app->logger.log("Square-Point clipping done.");
                     clickCount = 0;
                 }
@@ -704,6 +804,12 @@ void Application::handleMouseClick(const Point& position, void* context) {
                         lineP2 = position;
                         clipper.squareLineClipping(hdc, topLeft, sideLength,
                             lineP1, lineP2, color);
+                        app->persistentDrawings.push_back({
+                            PersistentDrawingType::SquareClipLine,
+                            {topLeft, lineP1, lineP2},
+                            0, 0, 0, 0, sideLength,
+                            app->drawingColor
+                        });
                         app->logger.log("Square-Line clipping done.");
                         clickCount = 0;
                     }
