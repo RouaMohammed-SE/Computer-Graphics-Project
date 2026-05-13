@@ -230,6 +230,87 @@ void Application::handleCommand(int commandId, void* context) {
             break;
         }
 
+        // Line Menu
+        case IDM_DDA_LINE:
+            app->menu.setMode(DrawingMode::DrawLine);
+            app->menu.setLineAlgorithm(LineAlgorithmType::DDA);
+            app->logger.log("Line mode: DDA. Click two points to draw a line.");
+            break;
+
+        case IDM_MIDPOINT_LINE:
+            app->menu.setMode(DrawingMode::DrawLine);
+            app->menu.setLineAlgorithm(LineAlgorithmType::Midpoint);
+            app->logger.log("Line mode: Midpoint. Click two points to draw a line.");
+            break;
+
+        case IDM_PARAMETRIC_LINE:
+            app->menu.setMode(DrawingMode::DrawLine);
+            app->menu.setLineAlgorithm(LineAlgorithmType::Parametric);
+            app->logger.log("Line mode: Parametric. Click two points to draw a line.");
+            break;
+
+        // Circle Menu
+        case IDM_DIRECT_CIRCLE:
+            app->menu.setMode(DrawingMode::DrawCircle);
+            app->menu.setCircleAlgorithm(CircleAlgorithmType::Direct);
+            app->logger.log("Circle mode: Direct. Click center, then a boundary point.");
+            break;
+
+        case IDM_POLAR_CIRCLE:
+            app->menu.setMode(DrawingMode::DrawCircle);
+            app->menu.setCircleAlgorithm(CircleAlgorithmType::Polar);
+            app->logger.log("Circle mode: Polar. Click center, then a boundary point.");
+            break;
+
+        case IDM_ITERATIVE_POLAR_CIRCLE:
+            app->menu.setMode(DrawingMode::DrawCircle);
+            app->menu.setCircleAlgorithm(CircleAlgorithmType::IterativePolar);
+            app->logger.log("Circle mode: Iterative Polar. Click center, then a boundary point.");
+            break;
+
+        case IDM_MIDPOINT_CIRCLE:
+            app->menu.setMode(DrawingMode::DrawCircle);
+            app->menu.setCircleAlgorithm(CircleAlgorithmType::Midpoint);
+            app->logger.log("Circle mode: Midpoint. Click center, then a boundary point.");
+            break;
+
+        case IDM_MODIFIED_MIDPOINT_CIRCLE:
+            app->menu.setMode(DrawingMode::DrawCircle);
+            app->menu.setCircleAlgorithm(CircleAlgorithmType::ModifiedMidpoint);
+            app->logger.log("Circle mode: Modified Midpoint. Click center, then a boundary point.");
+            break;
+
+        // Ellipse Menu
+        case IDM_DIRECT_ELLIPSE:
+            app->menu.setMode(DrawingMode::DrawEllipse);
+            app->menu.setEllipseAlgorithm(EllipseAlgorithmType::Direct);
+            app->logger.log("Ellipse mode: Direct. Click center, then radius points.");
+            break;
+
+        case IDM_POLAR_ELLIPSE:
+            app->menu.setMode(DrawingMode::DrawEllipse);
+            app->menu.setEllipseAlgorithm(EllipseAlgorithmType::Polar);
+            app->logger.log("Ellipse mode: Polar. Click center, then radius points.");
+            break;
+
+        case IDM_ITERATIVE_POLAR_ELLIPSE:
+            app->menu.setMode(DrawingMode::DrawEllipse);
+            app->menu.setEllipseAlgorithm(EllipseAlgorithmType::IterativePolar);
+            app->logger.log("Ellipse mode: Iterative Polar. Click center, then radius points.");
+            break;
+
+        case IDM_MIDPOINT_ELLIPSE:
+            app->menu.setMode(DrawingMode::DrawEllipse);
+            app->menu.setEllipseAlgorithm(EllipseAlgorithmType::Midpoint);
+            app->logger.log("Ellipse mode: Midpoint. Click center, then radius points.");
+            break;
+
+        // Curves Menu
+        case IDM_CARDINAL_SPLINE_CURVE:
+            app->menu.setMode(DrawingMode::DrawCurve);
+            app->logger.log("Curve mode: Cardinal Spline. Click control points to draw a curve.");
+            break;
+
         // Filling Menu
         case IDM_FILL_CIRCLE_WITH_LINES:
             app->menu.setMode(DrawingMode::Fill);

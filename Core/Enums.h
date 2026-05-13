@@ -36,6 +36,7 @@ enum class CircleAlgorithmType {
 enum class EllipseAlgorithmType {
     Direct,
     Polar,
+    IterativePolar,
     Midpoint
 };
 
