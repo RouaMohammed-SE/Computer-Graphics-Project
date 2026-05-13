@@ -926,21 +926,32 @@ void Application::handleCommand(int commandId, void* context) {
             std::cin  >> path;
             app->fileManager.saveShapes(path, app->shapes);
 
-            // Presistent drawings are not saved as Shape objects, so we need to append them to the same file manually
+            // Persistent drawings are not saved as Shape objects, so we need to append them to the same file manually
             std::ofstream file(path, std::ios::app);
             if (file.is_open()) {
                 for (const PersistentDrawing& drawing : app->persistentDrawings) {
                     file << "PERSISTENT " << static_cast<int>(drawing.type) << " "
-                        << drawing.radius << " "
+                        << drawing.radius      << " "
                         << drawing.innerRadius << " "
                         << drawing.outerRadius << " "
-                        << drawing.quarter << " "
-                        << drawing.sideLength << " "
+                        << drawing.quarter     << " "
+                        << drawing.sideLength  << " "
                         << static_cast<int>(drawing.color.r) << " "
                         << static_cast<int>(drawing.color.g) << " "
                         << static_cast<int>(drawing.color.b) << " "
+                        << static_cast<int>(drawing.floodColor.r) << " "
+                        << static_cast<int>(drawing.floodColor.g) << " "
+                        << static_cast<int>(drawing.floodColor.b) << " "
+                        << static_cast<int>(drawing.borderColor.r) << " "
+                        << static_cast<int>(drawing.borderColor.g) << " "
+                        << static_cast<int>(drawing.borderColor.b) << " "
+                        << drawing.floodPoint.x << " " << drawing.floodPoint.y << " "
                         << drawing.points.size();
                         for (const Point& point : drawing.points) {
+                            file << " " << point.x << " " << point.y;
+                        }
+                        file << " " << drawing.polygonPoints.size();
+                        for (const Point& point : drawing.polygonPoints) {
                             file << " " << point.x << " " << point.y;
                         }
                         file << "\n";
@@ -972,25 +983,37 @@ void Application::handleCommand(int commandId, void* context) {
                 if (token != "PERSISTENT") continue;  // skip shapes, already loaded
 
                 PersistentDrawing pd;
-                int typeInt, r, g, b, numPoints;
+                int typeInt, r, g, b, fcR, fcG, fcB, bcR, bcG, bcB, fpX, fpY, numPoints, numPolyPoints;
                 ss >> typeInt
-                >> pd.radius >> pd.innerRadius >> pd.outerRadius
-                >> pd.quarter >> pd.sideLength
-                >> r >> g >> b
-                >> numPoints;
-                pd.type  = static_cast<PersistentDrawingType>(typeInt);
-                pd.color = Color(r, g, b);
+                   >> pd.radius >> pd.innerRadius >> pd.outerRadius
+                   >> pd.quarter >> pd.sideLength
+                   >> r   >> g   >> b
+                   >> fcR >> fcG >> fcB
+                   >> bcR >> bcG >> bcB
+                   >> fpX >> fpY
+                   >> numPoints;
+                pd.type        = static_cast<PersistentDrawingType>(typeInt);
+                pd.color       = Color(r,   g,   b);
+                pd.floodColor  = Color(fcR, fcG, fcB);
+                pd.borderColor = Color(bcR, bcG, bcB);
+                pd.floodPoint  = Point(fpX, fpY);
                 for (int i = 0; i < numPoints; i++) {
                     int px, py;
                     ss >> px >> py;
                     pd.points.push_back(Point(px, py));
                 }
+                ss >> numPolyPoints;
+                for (int i = 0; i < numPolyPoints; i++) {
+                    int px, py;
+                    ss >> px >> py;
+                    pd.polygonPoints.push_back(Point(px, py));
+                }
                 app->persistentDrawings.push_back(pd);
             }
-        file.close();
-        app->logger.log("Persistent drawings loaded from file: " + path);
-        app->window.refresh();   // Repaint so loaded shapes appear
-        break;
+            file.close();
+            app->logger.log("Persistent drawings loaded from file: " + path);
+            app->window.refresh();   // Repaint so loaded shapes appear
+            break;
         }
 
         // Preferences Menu commands
