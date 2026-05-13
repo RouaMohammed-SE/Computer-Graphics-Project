@@ -110,44 +110,44 @@ void Application::resetPendingClicks() {
 void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& drawing) {
     COLORREF color = RGB(drawing.color.r, drawing.color.g, drawing.color.b);
     switch (drawing.type) {
-    case PersistentDrawingType::CircleFillWithLines:
-        CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.radius, color);
-        FillAlgorithms::fillCircleWithLines(hdc, drawing.points[0], drawing.radius, drawing.quarter, drawing.color);
-        break;
-    case PersistentDrawingType::CircleFillWithCircles:
-        CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.outerRadius, color);
-        FillAlgorithms::fillCircleWithCircles(
-            hdc,
-            drawing.points[0],
-            drawing.innerRadius,
-            drawing.outerRadius,
-            drawing.quarter,
-            drawing.color,
-            drawing.color);
-        break;
-    case PersistentDrawingType::RectangleFillWithCurves:
-        FillAlgorithms::fillRectangleWithCurves(hdc, drawing.points[0], drawing.points[1], color);
-        break;
-    case PersistentDrawingType::SquareFillWithCurves:
-        FillAlgorithms::fillSquareWithCurves(hdc, drawing.points[0], drawing.sideLength, color);
-        break;
-    case PersistentDrawingType::CircleClipPoint: {
-        Point center = drawing.points[0];
-        Point point = drawing.points[1];
-        CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
-        Clipper clipper;
-        clipper.circlePointClipping(hdc, center, drawing.radius, point, color);
-        break;
-    }
-    case PersistentDrawingType::CircleClipLine: {
-        Point center = drawing.points[0];
-        Point start = drawing.points[1];
-        Point end = drawing.points[2];
-        CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
-        Clipper clipper;
-        clipper.circleLineClipping(hdc, center, drawing.radius, start, end, color);
-        break;
-    }
+        case PersistentDrawingType::CircleFillWithLines:
+            CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.radius, color);
+            FillAlgorithms::fillCircleWithLines(hdc, drawing.points[0], drawing.radius, drawing.quarter, drawing.color);
+            break;
+        case PersistentDrawingType::CircleFillWithCircles:
+            CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.outerRadius, color);
+            FillAlgorithms::fillCircleWithCircles(
+                hdc,
+                drawing.points[0],
+                drawing.innerRadius,
+                drawing.outerRadius,
+                drawing.quarter,
+                drawing.color,
+                drawing.color);
+            break;
+        case PersistentDrawingType::RectangleFillWithCurves:
+            FillAlgorithms::fillRectangleWithCurves(hdc, drawing.points[0], drawing.points[1], color);
+            break;
+        case PersistentDrawingType::SquareFillWithCurves:
+            FillAlgorithms::fillSquareWithCurves(hdc, drawing.points[0], drawing.sideLength, color);
+            break;
+        case PersistentDrawingType::CircleClipPoint: {
+            Point center = drawing.points[0];
+            Point point = drawing.points[1];
+            CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
+            Clipper clipper;
+            clipper.circlePointClipping(hdc, center, drawing.radius, point, color);
+            break;
+        }
+        case PersistentDrawingType::CircleClipLine: {
+            Point center = drawing.points[0];
+            Point start = drawing.points[1];
+            Point end = drawing.points[2];
+            CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
+            Clipper clipper;
+            clipper.circleLineClipping(hdc, center, drawing.radius, start, end, color);
+            break;
+        }
     }
 }
 
@@ -400,10 +400,129 @@ void Application::handleMouseClick(const Point& position, void* context) {
         COLORREF clipColor = RGB(0, 0, 0);
 
         if (clipType == ClippingType::Rectangle) {
+            static int clickCount = 0;
+            static Point topLeft, bottomRight, lineP1, lineP2;
+            static std::vector<Point> polygonPoints;
 
+            if (clickCount == 0) {
+                topLeft = position;
+                clickCount++;
+                app->logger.log("Rectangle clip: top-left set. Click bottom-right.");
+            }
+            else if (clickCount == 1) {
+                bottomRight = position;
+                // Draw the rectangle window so user can see it
+                LineAlgorithms::drawDDA(hdc, topLeft, Point(bottomRight.x, topLeft.y), clipColor);
+                LineAlgorithms::drawDDA(hdc, Point(bottomRight.x, topLeft.y), bottomRight, clipColor);
+                LineAlgorithms::drawDDA(hdc, bottomRight, Point(topLeft.x, bottomRight.y), clipColor);
+                LineAlgorithms::drawDDA(hdc, Point(topLeft.x, bottomRight.y), topLeft, clipColor);
+                clickCount++;
+
+                if (clipAlgo == ClipAlgorithmType::PointClip)
+                    app->logger.log("Rectangle window drawn. Click the point to clip.");
+                else if (clipAlgo == ClipAlgorithmType::LineClip)
+                    app->logger.log("Rectangle window drawn. Click the line start point.");
+                else if (clipAlgo == ClipAlgorithmType::PolygonClip) {
+                    polygonPoints.clear();
+                    app->logger.log("Rectangle window drawn. Click polygon vertices. Right-click or double-click last point to finish.");
+                }
+            }
+            else if (clickCount >= 2) {
+                Clipper clipper;
+                if (clipAlgo == ClipAlgorithmType::PointClip) {
+                    clipper.rectanglePointClipping(hdc, topLeft, bottomRight,
+                        const_cast<Point&>(position), color);
+                    app->logger.log("Rectangle-Point clipping done.");
+                    clickCount = 0;
+                }
+                else if (clipAlgo == ClipAlgorithmType::LineClip) {
+                    if (clickCount == 2) {
+                        lineP1 = position;
+                        clickCount++;
+                        app->logger.log("Line start set. Click line end.");
+                    }
+                    else if (clickCount == 3) {
+                        lineP2 = position;
+                        clipper.rectangleLineClipping(hdc, topLeft, bottomRight,
+                            lineP1, lineP2, color);
+                        app->logger.log("Rectangle-Line clipping done.");
+                        clickCount = 0;
+                    }
+                }
+                else if (clipAlgo == ClipAlgorithmType::PolygonClip) {
+                    polygonPoints.push_back(position);
+                    // Draw the point so user sees progress
+                    SetPixel(hdc, position.x, position.y, color);
+                    app->logger.log("Polygon vertex added. Keep clicking, or re-click last point to finish.");
+
+                    // Finish on 3+ points if user clicks same spot twice (double-click)
+                    int n = polygonPoints.size();
+                    if (n >= 3) {
+                        const Point& last = polygonPoints[n - 1];
+                        const Point& secondLast = polygonPoints[n - 2];
+                        if (last.x == secondLast.x && last.y == secondLast.y) {
+                            polygonPoints.pop_back(); // remove duplicate
+                            clipper.rectanglePolygonClipping(hdc, topLeft, bottomRight, polygonPoints);
+                            app->logger.log("Rectangle-Polygon clipping done.");
+                            polygonPoints.clear();
+                            clickCount = 0;
+                        }
+                    }
+                }
+            }
         }
         else if (clipType == ClippingType::Square) {
+            static int clickCount = 0;
+            static Point topLeft, lineP1, lineP2;
+            static int sideLength = 0;
 
+            if (clickCount == 0) {
+                topLeft = position;
+                clickCount++;
+                app->logger.log("Square clip: top-left set. Click any point to set side length.");
+            }
+            else if (clickCount == 1) {
+                int dx = position.x - topLeft.x;
+                int dy = position.y - topLeft.y;
+                sideLength = static_cast<int>(std::round(std::sqrt(dx * dx + dy * dy)));
+                // Draw the square window
+                Point tr(topLeft.x + sideLength, topLeft.y);
+                Point br(topLeft.x + sideLength, topLeft.y + sideLength);
+                Point bl(topLeft.x,              topLeft.y + sideLength);
+                LineAlgorithms::drawDDA(hdc, topLeft, tr, clipColor);
+                LineAlgorithms::drawDDA(hdc, tr,      br, clipColor);
+                LineAlgorithms::drawDDA(hdc, br,      bl, clipColor);
+                LineAlgorithms::drawDDA(hdc, bl,  topLeft, clipColor);
+                clickCount++;
+
+                if (clipAlgo == ClipAlgorithmType::PointClip)
+                    app->logger.log("Square window drawn. Click the point to clip.");
+                else if (clipAlgo == ClipAlgorithmType::LineClip)
+                    app->logger.log("Square window drawn. Click the line start point.");
+            }
+            else if (clickCount >= 2) {
+                Clipper clipper;
+                if (clipAlgo == ClipAlgorithmType::PointClip) {
+                    clipper.squarePointClipping(hdc, topLeft, sideLength,
+                        const_cast<Point&>(position), color);
+                    app->logger.log("Square-Point clipping done.");
+                    clickCount = 0;
+                }
+                else if (clipAlgo == ClipAlgorithmType::LineClip) {
+                    if (clickCount == 2) {
+                        lineP1 = position;
+                        clickCount++;
+                        app->logger.log("Line start set. Click line end.");
+                    }
+                    else if (clickCount == 3) {
+                        lineP2 = position;
+                        clipper.squareLineClipping(hdc, topLeft, sideLength,
+                            lineP1, lineP2, color);
+                        app->logger.log("Square-Line clipping done.");
+                        clickCount = 0;
+                    }
+                }
+            }
         }
         else if (clipType == ClippingType::Circle) {
             static int radius;
