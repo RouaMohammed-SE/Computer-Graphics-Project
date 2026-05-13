@@ -47,10 +47,10 @@ void CircleAlgorithms::drawIterativePolar(HDC hdc, const Point& center, int radi
     int xc = center.x, yc = center.y;
     double dtheta = 1.0/radius, costheta = cos(dtheta), sintheta = sin(dtheta);
     double x = radius, y = 0;
-    draw8Points(hdc, xc, yc, x, y, color);
+    draw8Points(hdc, xc, yc, radius, 0, color);
     while (x > y) {
         double x2 = x * costheta - y * sintheta;
-        y = x * costheta + y * sintheta;
+        y = x * sintheta + y * costheta;
         x = x2;
         draw8Points(hdc, xc, yc, round(x), round(y), color);
     }
