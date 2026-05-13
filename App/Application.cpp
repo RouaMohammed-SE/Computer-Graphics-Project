@@ -139,6 +139,111 @@ void Application::handlePaint(HDC hdc, void* context) {
 void Application::handleMouseClick(const Point& position, void* context) {
     Application* app = static_cast<Application*>(context);
     app->inputHandler.processMouseClick(position);
+
+    HDC hdc = GetDC(app->window.getHandle());
+    DrawingMode mode = app->menu.getMode();
+    COLORREF color = RGB(app->drawingColor.r, app->drawingColor.g, app->drawingColor.b);
+
+    if (mode == DrawingMode::DrawLine) {
+
+    }
+    else if (mode == DrawingMode::DrawCircle) {
+
+    }
+    else if (mode == DrawingMode::DrawEllipse) {
+
+    }
+    else if (mode == DrawingMode::DrawCurve) {
+
+    }
+    else if (mode == DrawingMode::Fill) {
+        FillAlgorithmType fillType = app->menu.getFillAlgorithm();
+        if (fillType == FillAlgorithmType::SquareFillWithCurves) {
+            static int clickCount = 0;
+            static Point topLeft;
+
+            if (clickCount == 0) {
+                topLeft = position;
+                clickCount = 1;
+                app->logger.log("Fill Square: top-left set. Click any point to set size.");
+            }
+            else {
+                int side = sqrt((topLeft.x-position.x) * (topLeft.x-position.x) + (topLeft.y-position.y) * (topLeft.y-position.y));
+                FillAlgorithms::fillSquareWithCurves(hdc, topLeft, side, color);
+                app->logger.log("Fill Square done.");
+                clickCount = 0;
+            }
+        }
+        else if (fillType == FillAlgorithmType::RectangleFillWithCurves) {
+            static int clickCount = 0;
+            static Point topLeft;
+
+            if (clickCount == 0) {
+                topLeft = position;
+                clickCount = 1;
+                app->logger.log("Fill Rectangle: top-left set. Click bottom-right.");
+            }
+            else {
+                FillAlgorithms::fillRectangleWithCurves(hdc, topLeft, position, color);
+                app->logger.log("Fill Rectangle done.");
+                clickCount = 0;
+            }
+        }
+    }
+    else if (mode == DrawingMode::Clip) {
+        static Clipper clipper;
+        static int clickCount = 0;
+
+        ClippingType    clipType = app->menu.getClippingType();
+        ClipAlgorithmType clipAlgo = app->menu.getClipAlgorithm();
+        COLORREF clipColor = RGB(255, 255, 255);
+
+        if (clipType == ClippingType::Rectangle) {
+
+        }
+        else if (clipType == ClippingType::Square) {
+
+        }
+        else if (clipType == ClippingType::Circle) {
+            int radius;
+            Point center, p2, lineP1, lineP2;
+            if (clickCount == 0) {
+                center = position;
+                clickCount++;
+                app->logger.log("Circle clip: center set. Click a point on the circle boundary.");
+            }
+            else if (clickCount == 1) {
+                p2 = position;
+                radius = sqrt((center.x-p2.x) * (center.x-p2.x) + (center.y-p2.y) * (center.y-p2.y));
+                CircleAlgorithms::drawMidpoint(hdc, center, radius, clipColor);
+                clickCount++;
+                if (clipAlgo == ClipAlgorithmType::PointClip)
+                    app->logger.log("Circle window drawn. Click the point to clip.");
+                else
+                    app->logger.log("Circle window drawn. Click start of the line to clip.");
+            }
+            else if (clickCount == 3) {
+                if (clipAlgo == ClipAlgorithmType::PointClip) {
+                    clipper.circlePointClipping(hdc, center, radius, const_cast<Point&>(position), color);
+                    app->logger.log("Circle-Point clipping done.");
+                    clickCount = 3; // allow user to enter point again
+                }
+                else if (clipAlgo == ClipAlgorithmType::LineClip) {
+                    lineP1 = position;
+                    clickCount++;
+                    app->logger.log("Line start set. Click line end.");
+                }
+                else if (clickCount == 4) {
+                    lineP2 = position;
+                    clipper.circleLineClipping(hdc, center, radius, lineP1, lineP2, color);
+                    clickCount = 3; // allow user to enter line again
+                }
+            }
+
+        }
+
+    }
+    ReleaseDC(app->window.getHandle(), hdc);
     app->update();
 }
 
