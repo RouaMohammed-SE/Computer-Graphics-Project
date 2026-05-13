@@ -20,10 +20,10 @@ void intersect(Point& p, Point p1, Point p2, int edge);
 bool cohensuth(Point& p1, Point& p2);
 
 // polygon clipping helpers
-bool insideLeft  (Point p, double e) { return p.x >= e; }
-bool insideRight (Point p, double e) { return p.x <= e; }
-bool insideBottom(Point p, double e) { return p.y >= e; }
-bool insideTop   (Point p, double e) { return p.y <= e; }
+bool insideLeft  (Point p, double e);
+bool insideRight (Point p, double e);
+bool insideBottom(Point p, double e);
+bool insideTop   (Point p, double e);
 
 typedef bool   (*InsideF)   (Point, double);
 typedef Point  (*IntersectF)(Point, Point, double);
@@ -223,6 +223,11 @@ bool cohensuth(Point& p1, Point& p2) {
         }
     }
 }
+
+bool insideLeft  (Point p, double e) { return p.x >= e; }
+bool insideRight (Point p, double e) { return p.x <= e; }
+bool insideBottom(Point p, double e) { return p.y >= e; }
+bool insideTop   (Point p, double e) { return p.y <= e; }
 
 Point intersectV(Point p1, Point p2, double xedge) {
     return { (int)xedge, (int)round(p1.y + (p2.y - p1.y) / (p2.x - p1.x) * (xedge - p1.x)) };
