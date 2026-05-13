@@ -76,6 +76,7 @@ void Application::render(HDC hdc) {
     for (const PersistentDrawing& drawing : persistentDrawings) {
         replayPersistentDrawing(hdc, drawing);
     }
+    drawPendingClickMarkers(hdc);
 }
 
 void Application::addShape(Shape* shape) {
@@ -149,6 +150,25 @@ void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& draw
         break;
     }
     }
+}
+
+void Application::drawPendingClickMarkers(HDC hdc) {
+    if (pendingClicks.empty()) return;
+
+    HPEN markerPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    HBRUSH markerBrush = CreateSolidBrush(RGB(255, 0, 0));
+    HPEN oldPen = (HPEN)SelectObject(hdc, markerPen);
+    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, markerBrush);
+
+    const int radius = 4;
+    for (const Point& point : pendingClicks) {
+        Ellipse(hdc, point.x - radius, point.y - radius, point.x + radius, point.y + radius);
+    }
+
+    SelectObject(hdc, oldBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(markerBrush);
+    DeleteObject(markerPen);
 }
 
 void Application::addSmileyFace(const Point& center, bool happy) {
@@ -463,6 +483,7 @@ void Application::handleMouseClick(const Point& position, void* context) {
         }
 
     }
+    app->window.refresh();
     ReleaseDC(app->window.getHandle(), hdc);
     app->update();
 }

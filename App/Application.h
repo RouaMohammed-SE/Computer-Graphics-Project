@@ -61,6 +61,7 @@ private:
     void addSmileyFace(const Point& center, bool happy);
     void resetPendingClicks();
     void replayPersistentDrawing(HDC hdc, const PersistentDrawing& drawing);
+    void drawPendingClickMarkers(HDC hdc);
 
     Window window;
     InputHandler inputHandler;
