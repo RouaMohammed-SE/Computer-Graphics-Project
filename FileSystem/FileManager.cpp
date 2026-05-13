@@ -68,6 +68,10 @@ void FileManager::loadShapes(const std::string& filePath, std::vector<Shape*>& s
             ss >> r >> g >> b;
             shapes.push_back(new Curve(pts, tension, Color(r, g, b)));
         }
+        else if (shapeType == "PERSISTENT") {
+            // Handled by Application, skip silently
+            continue;
+        }
         else {
             std::cout << "[WARN]  Unknown shape type in file: " << shapeType << std::endl;
         }

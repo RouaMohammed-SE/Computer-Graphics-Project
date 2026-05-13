@@ -12,6 +12,8 @@
 #include "../Shapes/Ellipse.h"
 #include "../Shapes/Line.h"
 #include <commdlg.h>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -654,6 +656,31 @@ void Application::handleCommand(int commandId, void* context) {
             std::cout << "[INPUT] Enter file path to save: ";
             std::cin  >> path;
             app->fileManager.saveShapes(path, app->shapes);
+
+            // Presistent drawings are not saved as Shape objects, so we need to append them to the same file manually
+            std::ofstream file(path, std::ios::app);
+            if (file.is_open()) {
+                for (const PersistentDrawing& drawing : app->persistentDrawings) {
+                    file << "PERSISTENT " << static_cast<int>(drawing.type) << " "
+                        << drawing.radius << " "
+                        << drawing.innerRadius << " "
+                        << drawing.outerRadius << " "
+                        << drawing.quarter << " "
+                        << drawing.sideLength << " "
+                        << static_cast<int>(drawing.color.r) << " "
+                        << static_cast<int>(drawing.color.g) << " "
+                        << static_cast<int>(drawing.color.b) << " "
+                        << drawing.points.size();
+                        for (const Point& point : drawing.points) {
+                            file << " " << point.x << " " << point.y;
+                        }
+                        file << "\n";
+                }
+                file.close();
+                app->logger.log("Persistent drawings saved to file: " + path);
+            } else {
+                app->logger.error("Failed to open file for saving: " + path);
+            }
             break;
         }
 
@@ -663,8 +690,38 @@ void Application::handleCommand(int commandId, void* context) {
             std::cout << "[INPUT] Enter file path to load: ";
             std::cin  >> path;
             app->fileManager.loadShapes(path, app->shapes);
-            app->window.refresh();   // Repaint so loaded shapes appear
-            break;
+            app->persistentDrawings.clear(); // Clear any existing persistent drawings since they won't be in the file
+
+            // Re-read the file to load persistent drawings
+            std::ifstream file(path);
+            std::string line;
+            while (std::getline(file, line)) {
+                if (line.empty()) continue;
+                std::istringstream ss(line);
+                std::string token;
+                ss >> token;
+                if (token != "PERSISTENT") continue;  // skip shapes, already loaded
+
+                PersistentDrawing pd;
+                int typeInt, r, g, b, numPoints;
+                ss >> typeInt
+                >> pd.radius >> pd.innerRadius >> pd.outerRadius
+                >> pd.quarter >> pd.sideLength
+                >> r >> g >> b
+                >> numPoints;
+                pd.type  = static_cast<PersistentDrawingType>(typeInt);
+                pd.color = Color(r, g, b);
+                for (int i = 0; i < numPoints; i++) {
+                    int px, py;
+                    ss >> px >> py;
+                    pd.points.push_back(Point(px, py));
+                }
+                app->persistentDrawings.push_back(pd);
+            }
+        file.close();
+        app->logger.log("Persistent drawings loaded from file: " + path);
+        app->window.refresh();   // Repaint so loaded shapes appear
+        break;
         }
 
         // Preferences Menu commands
