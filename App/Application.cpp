@@ -309,7 +309,7 @@ void Application::handleMouseClick(const Point& position, void* context) {
 
         ClippingType    clipType = app->menu.getClippingType();
         ClipAlgorithmType clipAlgo = app->menu.getClipAlgorithm();
-        COLORREF clipColor = RGB(255, 255, 255);
+        COLORREF clipColor = RGB(0, 0, 0);
 
         if (clipType == ClippingType::Rectangle) {
 
@@ -318,8 +318,8 @@ void Application::handleMouseClick(const Point& position, void* context) {
 
         }
         else if (clipType == ClippingType::Circle) {
-            int radius;
-            Point center, p2, lineP1, lineP2;
+            static int radius;
+            static Point center, p2, lineP1, lineP2;
             if (clickCount == 0) {
                 center = position;
                 clickCount++;
@@ -335,24 +335,23 @@ void Application::handleMouseClick(const Point& position, void* context) {
                 else
                     app->logger.log("Circle window drawn. Click start of the line to clip.");
             }
-            else if (clickCount == 3) {
+            else if (clickCount == 2) {
                 if (clipAlgo == ClipAlgorithmType::PointClip) {
                     clipper.circlePointClipping(hdc, center, radius, const_cast<Point&>(position), color);
                     app->logger.log("Circle-Point clipping done.");
-                    clickCount = 3; // allow user to enter point again
+                    clickCount = 2; // allow user to enter point again
                 }
                 else if (clipAlgo == ClipAlgorithmType::LineClip) {
                     lineP1 = position;
                     clickCount++;
                     app->logger.log("Line start set. Click line end.");
                 }
-                else if (clickCount == 4) {
-                    lineP2 = position;
-                    clipper.circleLineClipping(hdc, center, radius, lineP1, lineP2, color);
-                    clickCount = 3; // allow user to enter line again
-                }
             }
-
+            else if (clickCount == 3) {
+                lineP2 = position;
+                clipper.circleLineClipping(hdc, center, radius, lineP1, lineP2, color);
+                clickCount = 2; // allow user to enter line again
+            }
         }
 
     }
