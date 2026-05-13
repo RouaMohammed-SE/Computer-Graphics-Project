@@ -25,6 +25,7 @@ public:
         const Color& endColor);
     static void fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, COLORREF fillColor);
     static void fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, COLORREF fillColor);
+    static void convexFill(HDC hdc,Point p[],int n,COLORREF color);
 };
 
 #endif

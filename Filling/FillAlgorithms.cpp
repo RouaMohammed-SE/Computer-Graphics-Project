@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <queue>
+#define MAXENTRIES 600
 
 using namespace std;
 
@@ -20,6 +21,17 @@ namespace {
     void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, COLORREF color);
 
     void drawQuarterLines(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color);
+
+    struct Entry
+    {
+        int xleft,xright;
+    };
+
+    void InitEntries(Entry table[]);
+
+    void ScanEdge(Point p1,Point p2,Entry table[]);
+
+    void DrawScanLines(HDC hdc,Entry table[],COLORREF color);
 }
 
 // -----------------------------------------------
@@ -159,6 +171,21 @@ void FillAlgorithms::fillSquareWithCurves(HDC hdc, const Point& topLeft, int sid
     }
 }
 
+void FillAlgorithms::convexFill(HDC hdc,Point p[],int n,COLORREF color){
+    Entry *table = new Entry[MAXENTRIES];
+
+    InitEntries(table);
+
+    Point p1 = p[n-1];
+    for(int i = 0; i < n; i++){
+        Point p2 = p[i];
+        ScanEdge(p1,p2,table);
+        p1 = p[i];
+    }
+    DrawScanLines(hdc, table, color);
+    delete [] table;
+}
+
 //------------- Helpers Implementation ---------------
 
 namespace {
@@ -266,5 +293,40 @@ namespace {
                 LineAlgorithms::drawDDA(hdc, center, Point(center.x - y, center.y - x), color);
                 break;
         }
+    }
+
+    void InitEntries(Entry table[]) {
+        for (int i = 0; i < MAXENTRIES; i++) {
+            table[i].xleft = MAXINT;
+            table[i].xright = MININT;
+        }
+    }
+
+    void ScanEdge(Point p1,Point p2,Entry table[])
+    {
+        if(p1.y == p2.y) return;
+        if(p1.y > p2.y) swap(p1,p2);
+
+        double minv = (double) (p2.x-p1.x) / (p2.y-p1.y);
+        double x = p1.x;
+        int y = p1.y;
+
+        while(y < p2.y)
+        {
+            if(x < table[y].xleft) table[y].xleft = (int)ceil(x);
+            if(x > table[y].xright) table[y].xright = (int)floor(x);
+            y++;
+            x+=minv;
+        }
+    }
+
+    void DrawScanLines(HDC hdc,Entry table[],COLORREF color)
+    {
+        for(int y = 0; y < MAXENTRIES; y++)
+            if(table[y].xleft < table[y].xright) {
+                for(int x = table[y].xleft; x <= table[y].xright; x++)
+                    SetPixel(hdc,x,y,color);
+            }
+
     }
 }
