@@ -11,8 +11,8 @@ class FillAlgorithms {
 public:
     FillAlgorithms();
 
-    static void floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor);
-    static void floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor);
+    static void floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor);
+    static void floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor, const Color& borderColor);
     static void fillCircle(HDC hdc, const Point& center, int radius, const Color& fillColor);
     static void fillCircleWithCircles(
         HDC hdc,

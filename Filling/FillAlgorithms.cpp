@@ -83,11 +83,21 @@ void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, 
 }
 }
 
-void FillAlgorithms::floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor) {
-    // TODO: Implement recursive flood fill.
+void FillAlgorithms::floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor) {
+    int x = start.x , y = start.y;
+    COLORREF c = GetPixel(hdc , x , y);
+    COLORREF fillRef  = toColorRef(fillColor);
+    COLORREF borderRef = toColorRef(borderColor);
+    if(c != fillRef && c != borderRef){
+        SetPixel(hdc , x , y , fillRef);
+        floodFillRecursive(hdc , {x+1,y} , fillColor , borderColor);
+        floodFillRecursive(hdc , {x-1,y} , fillColor , borderColor);
+        floodFillRecursive(hdc , {x , y+1} , fillColor , borderColor);
+        floodFillRecursive(hdc , {x , y-1 }, fillColor , borderColor);
+    }
 }
 
-void FillAlgorithms::floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor) {
+void FillAlgorithms::floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor) {
     // TODO: Implement non-recursive flood fill.
 }
 
