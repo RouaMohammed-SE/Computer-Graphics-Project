@@ -54,6 +54,7 @@ private:
     static void handlePaint(HDC hdc, void* context);
     static void handleMouseClick(const Point& position, void* context);
     static void handleMouseMove(const Point& position, void* context);
+    static void handleRightClick(const Point& position, void* context);
     // Called by Window whenever a menu item is clicked (WM_COMMAND)
     static void handleCommand    (int commandId, void* context);
 

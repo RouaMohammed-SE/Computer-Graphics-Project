@@ -35,6 +35,7 @@ Application::Application()
     window.setPaintCallback(Application::handlePaint, this);
     window.setMouseClickCallback(Application::handleMouseClick, this);
     window.setMouseMoveCallback(Application::handleMouseMove, this);
+    window.setRightClickCallback(Application::handleRightClick, this);
     window.setCommandCallback(Application::handleCommand, this);
 }
 
@@ -262,14 +263,7 @@ void Application::handleMouseClick(const Point& position, void* context) {
     }
     else if (mode == DrawingMode::DrawCurve) {
         app->pendingClicks.push_back(position);
-        if (app->pendingClicks.size() < 4) {
-            app->logger.log("Curve control point set. Click until 4 points are selected.");
-        } else {
-            app->addShape(new Curve(app->pendingClicks, 0.5, app->drawingColor));
-            app->resetPendingClicks();
-            app->window.refresh();
-            app->logger.log("Cardinal spline curve drawn.");
-        }
+        app->logger.log("Curve control point set. Right-click to finalize.");
     }
     else if (mode == DrawingMode::DrawSmiley) {
         app->addSmileyFace(position, app->pendingHappyFace);
@@ -474,6 +468,23 @@ void Application::handleMouseClick(const Point& position, void* context) {
 void Application::handleMouseMove(const Point& position, void* context) {
     Application* app = static_cast<Application*>(context);
     app->inputHandler.processMouseMove(position);
+}
+
+void Application::handleRightClick(const Point& position, void* context) {
+    Application* app = static_cast<Application*>(context);
+    DrawingMode mode = app->menu.getMode();
+    
+    if (mode == DrawingMode::DrawCurve) {
+        if (app->pendingClicks.size() >= 2) {
+            int pointCount = app->pendingClicks.size();
+            app->addShape(new Curve(app->pendingClicks, 0.5, app->drawingColor));
+            app->resetPendingClicks();
+            app->window.refresh();
+            app->logger.log("Cardinal spline curve drawn with " + std::to_string(pointCount) + " points.");
+        } else {
+            app->logger.log("Need at least 2 points to create a curve. Current points: " + std::to_string(app->pendingClicks.size()));
+        }
+    }
 }
 
 // handleCommand

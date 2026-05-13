@@ -10,6 +10,7 @@ class Window;
 
 typedef void (*PaintCallback)(HDC hdc, void* context);
 typedef void (*MouseCallback)(const Point& position, void* context);
+typedef void (*RightClickCallback)(const Point& position, void* context);
 typedef void (*CommandCallback)(int commandId, void* context);
 
 // Owns the drawing surface and window-level rendering operations.
@@ -28,6 +29,7 @@ public:
     void setPaintCallback(PaintCallback callback, void* context);
     void setMouseClickCallback(MouseCallback callback, void* context);
     void setMouseMoveCallback(MouseCallback callback, void* context);
+    void setRightClickCallback(RightClickCallback callback, void* context);
     void setCommandCallback(CommandCallback callback, void* context);
     HWND getHandle() const;
 
@@ -46,11 +48,13 @@ private:
     PaintCallback paintCallback;
     MouseCallback mouseClickCallback;
     MouseCallback mouseMoveCallback;
+    RightClickCallback rightClickCallback;
     CommandCallback commandCallback;
 
     void* paintContext;
     void* mouseClickContext;
     void* mouseMoveContext;
+    void* rightClickContext;
     void* commandContext;
 };
 

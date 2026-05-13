@@ -12,10 +12,12 @@ Window::Window()
       paintCallback(nullptr),
       mouseClickCallback(nullptr),
       mouseMoveCallback(nullptr),
+      rightClickCallback(nullptr),
       commandCallback(nullptr),
       paintContext(nullptr),
       mouseClickContext(nullptr),
       mouseMoveContext(nullptr),
+      rightClickContext(nullptr),
       commandContext(nullptr) {}
 
 Window::Window(int width, int height, const Color& backgroundColor)
@@ -28,10 +30,12 @@ Window::Window(int width, int height, const Color& backgroundColor)
       paintCallback(nullptr),
       mouseClickCallback(nullptr),
       mouseMoveCallback(nullptr),
-        commandCallback(nullptr),
+      rightClickCallback(nullptr),
+      commandCallback(nullptr),
       paintContext(nullptr),
       mouseClickContext(nullptr),
       mouseMoveContext(nullptr),
+      rightClickContext(nullptr),
       commandContext(nullptr) {}
 
 bool Window::create(const wchar_t* title) { 
@@ -202,6 +206,11 @@ void Window::setMouseMoveCallback(MouseCallback callback, void* context) {
     mouseMoveContext = context;
 }
 
+void Window::setRightClickCallback(RightClickCallback callback, void* context) {
+    rightClickCallback = callback;
+    rightClickContext = context;
+}
+
 void Window::setCommandCallback(CommandCallback callback, void* context) {
     commandCallback = callback;
     commandContext = context;
@@ -244,6 +253,14 @@ LRESULT Window::handleMessage(UINT message, WPARAM wParam, LPARAM lParam) {
         if (mouseClickCallback) {
             Point pos(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             mouseClickCallback(pos, mouseClickContext);
+        }
+        return 0;
+    }
+
+    case WM_RBUTTONDOWN: {
+        if (rightClickCallback) {
+            Point pos(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            rightClickCallback(pos, rightClickContext);
         }
         return 0;
     }
