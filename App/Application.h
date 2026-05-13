@@ -40,6 +40,7 @@ struct PersistentDrawing {
     std::vector<Point> polygonPoints;
     Point floodPoint;
     Color floodColor;
+    Color borderColor;
 };
 
 // Main controller that coordinates window, input, menu, files, and shapes.

@@ -154,25 +154,21 @@ void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& draw
         }
         case PersistentDrawingType::FloodFillRecursive:
         {
-            Color borderColor(0,0,0);
-
             FillAlgorithms::floodFillRecursive(
                 hdc,
                 drawing.floodPoint,
                 drawing.floodColor,
-                borderColor
+                drawing.borderColor
             );
             break;
         }
         case PersistentDrawingType::FloodFillNonRecursive:
         {
-            Color borderColor(0,0,0);
-
             FillAlgorithms::floodFillNonRecursive(
                 hdc,
                 drawing.floodPoint,
                 drawing.floodColor,
-                borderColor
+                drawing.borderColor
             );
             break;
         }
@@ -492,12 +488,11 @@ void Application::handleMouseClick(const Point& position, void* context) {
             }
         }
         else if (fillType == FillAlgorithmType::FloodFillRecursive) {
-            Color borderColor(0, 0, 0);
             FillAlgorithms::floodFillRecursive(
             hdc,
             position,
             app->floodFillingColor,
-            borderColor
+            app->drawingColor
             );
 
             PersistentDrawing drawing;
@@ -505,19 +500,20 @@ void Application::handleMouseClick(const Point& position, void* context) {
             drawing.type = PersistentDrawingType::FloodFillRecursive;
             drawing.floodPoint = position;
             drawing.floodColor = app->floodFillingColor;
+            drawing.borderColor = app->drawingColor;
 
             app->persistentDrawings.push_back(drawing);
             app->logger.log("Flood Fill (Recursive) done.");
         }
         else if (fillType == FillAlgorithmType::FloodFillNonRecursive) {
-            Color borderColor(0, 0, 0);
             FillAlgorithms::floodFillNonRecursive(hdc, position,
-                app->floodFillingColor, borderColor);
+                app->floodFillingColor, app->drawingColor);
             PersistentDrawing drawing;
 
             drawing.type = PersistentDrawingType::FloodFillNonRecursive;
             drawing.floodPoint = position;
             drawing.floodColor = app->floodFillingColor;
+            drawing.borderColor = app->drawingColor;
 
             app->persistentDrawings.push_back(drawing);
             app->logger.log("Flood Fill (Non-Recursive) done.");
