@@ -2,19 +2,22 @@
 #ifndef CLIPPING_CLIPPER_H
 #define CLIPPING_CLIPPER_H
 
-#include "../Shapes/Shape.h"
 #include "../Utils/Point.h"
+#include "../Algorithms/LineAlgorithms.h"
+#include <vector>
+
+using namespace std;
 
 // Provides clipping operations for shapes against supported regions.
 class Clipper {
 public:
     Clipper();
 
-    void quadPointClipping(HDC hdc, Point &topleft , Point &bottomright , Point& point , COLORREF c);
-    void quadLineClipping(HDC hdc, Point &topleft , Point &bottomright , Point& start , Point& end , COLORREF c);
-    void clipAgainstRectangle(Shape* shape, const Point& topLeft, const Point& bottomRight);
-    void clipAgainstSquare(Shape* shape, const Point& topLeft, int sideLength);
-    void clipAgainstCircle(Shape* shape, const Point& center, int radius);
+    void rectanglePointClipping(HDC hdc, Point &topleft , Point &bottomright , Point& point , COLORREF c);
+    void rectangleLineClipping(HDC hdc, Point &topleft , Point &bottomright , Point& start , Point& end , COLORREF c);
+    void rectanglePolygonClipping(HDC hdc , Point& topleft , Point& bottomright , vector<Point>& P);
+    void squarePointClipping(HDC hdc, Point &topleft , int sideLength, Point& point , COLORREF c);
+    void squareLineClipping(HDC hdc, Point &topleft , int sideLength , Point& start , Point& end , COLORREF c);
     void circlePointClipping(HDC hdc, Point &center, int radius, Point &point, COLORREF c);
     void circleLineClipping(HDC hdc, Point &center, int radius, Point &point1, Point &point2, COLORREF c);
 };
