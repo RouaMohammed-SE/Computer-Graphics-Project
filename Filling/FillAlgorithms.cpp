@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <queue>
+#include <list>
 #define MAXENTRIES 600
 
 using namespace std;
@@ -32,6 +33,23 @@ namespace {
     void ScanEdge(Point p1,Point p2,Entry table[]);
 
     void DrawScanLines(HDC hdc,Entry table[],COLORREF color);
+
+    struct EdgeRec
+    {
+        double x;
+        double minv;
+        int ymax;
+        bool operator<(EdgeRec r)
+        {
+            return x < r.x;
+        }
+    };
+
+    typedef list<EdgeRec> EdgeList;
+
+    EdgeRec InitEdgeRec(Point& p1,Point& p2);
+
+    void InitEdgeTable(Point *polygon, int n, EdgeList table[]);
 }
 
 // -----------------------------------------------
@@ -186,6 +204,45 @@ void FillAlgorithms::convexFill(HDC hdc,Point p[],int n,COLORREF color){
     delete [] table;
 }
 
+void FillAlgorithms::nonConvexFill(HDC hdc, Point *polygon, int n, COLORREF c){
+    auto *table = new EdgeList [MAXENTRIES];
+    InitEdgeTable(polygon, n, table);
+
+    int y = 0;
+    while(y < MAXENTRIES && table[y].empty())
+        y++;
+
+    if(y == MAXENTRIES) return;
+
+    EdgeList ActiveList = table[y];
+
+    while (!ActiveList.empty()){
+        ActiveList.sort();
+
+        for(auto it=ActiveList.begin(); it!=ActiveList.end(); ++it){
+            int x1 = (int)ceil(it->x);
+            it++;
+            int x2 = (int)floor(it->x);
+            for(int x = x1; x <= x2; x++)
+                SetPixel(hdc,x,y,c);
+        }
+        y++;
+
+        auto it = ActiveList.begin();
+        while(it != ActiveList.end()) {
+            if(y == it->ymax) it = ActiveList.erase(it);
+            else it++;
+        }
+
+        for(auto & it1 : ActiveList)
+            it1.x += it1.minv;
+
+        if (y < MAXENTRIES)
+            ActiveList.insert(ActiveList.end(),table[y].begin(),table[y].end());
+    }
+    delete[] table;
+}
+
 //------------- Helpers Implementation ---------------
 
 namespace {
@@ -297,8 +354,8 @@ namespace {
 
     void InitEntries(Entry table[]) {
         for (int i = 0; i < MAXENTRIES; i++) {
-            table[i].xleft = MAXINT;
-            table[i].xright = MININT;
+            table[i].xleft = INT_MAX;
+            table[i].xright = INT_MIN;
         }
     }
 
@@ -320,13 +377,35 @@ namespace {
         }
     }
 
-    void DrawScanLines(HDC hdc,Entry table[],COLORREF color)
-    {
-        for(int y = 0; y < MAXENTRIES; y++)
+    void DrawScanLines(HDC hdc,Entry table[],COLORREF color){
+        for(int y = 0; y < MAXENTRIES; y++) {
             if(table[y].xleft < table[y].xright) {
                 for(int x = table[y].xleft; x <= table[y].xright; x++)
                     SetPixel(hdc,x,y,color);
             }
+        }
+    }
 
+    EdgeRec InitEdgeRec(Point& p1,Point& p2){
+        if(p1.y > p2.y) swap(p1,p2);
+        EdgeRec rec;
+        rec.x = p1.x;
+        rec.ymax = p2.y;
+        rec.minv = (double)(p2.x-p1.x) / (p2.y-p1.y);
+        return rec;
+    }
+
+    void InitEdgeTable(Point *polygon, int n, EdgeList table[]){
+        Point p1 = polygon[n-1];
+        for(int i = 0;i < n; i++){
+            Point p2 = polygon[i];
+            if(p1.y == p2.y) {
+                p1 = p2;
+                continue;
+            }
+            EdgeRec rec = InitEdgeRec(p1, p2);
+            table[p1.y].push_back(rec);
+            p1 = polygon[i];
+        }
     }
 }
