@@ -386,7 +386,7 @@ void Application::handleCommand(int commandId, void* context) {
             //1b: save all drawn shapes to a file
             // Requirement 10: take file path from the console
             std::string path;
-            std::cout << "[INPUT] Enter file path to save (e.g. drawing.cg): ";
+            std::cout << "[INPUT] Enter file path to save: ";
             std::cin  >> path;
             app->fileManager.saveShapes(path, app->shapes);
             break;
