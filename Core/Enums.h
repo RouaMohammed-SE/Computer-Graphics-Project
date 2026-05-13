@@ -9,6 +9,7 @@ enum class DrawingMode {
     DrawCircle,
     DrawEllipse,
     DrawCurve,
+    DrawSmiley,
     Fill,
     Clip,
     Save,

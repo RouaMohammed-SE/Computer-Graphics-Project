@@ -37,7 +37,7 @@ private:
     // Called by Window whenever a menu item is clicked (WM_COMMAND)
     static void handleCommand    (int commandId, void* context);
 
-    void addSmileyFace(bool happy);
+    void addSmileyFace(const Point& center, bool happy);
     void resetPendingClicks();
 
     Window window;
@@ -50,6 +50,7 @@ private:
     std::vector<Shape*> shapes;
     std::vector<Point> pendingClicks;
     int fillQuarter;
+    bool pendingHappyFace;
     Color drawingColor;
     Color backgroundColor;
 };

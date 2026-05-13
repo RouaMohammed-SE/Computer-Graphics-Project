@@ -28,6 +28,7 @@ Application::Application()
       shapes(),
       pendingClicks(),
       fillQuarter(1),
+      pendingHappyFace(true),
       drawingColor(0, 0, 0),
       backgroundColor(255, 255, 255) {
     window.setPaintCallback(Application::handlePaint, this);
@@ -100,9 +101,8 @@ void Application::resetPendingClicks() {
     pendingClicks.clear();
 }
 
-void Application::addSmileyFace(bool happy) {
+void Application::addSmileyFace(const Point& center, bool happy) {
     const Color faceColor = drawingColor;
-    const Point center(400, 280);
     const int faceRadius = 120;
 
     addShape(new Circle(center, faceRadius, CircleAlgorithmType::Midpoint, faceColor));
@@ -221,6 +221,9 @@ void Application::handleMouseClick(const Point& position, void* context) {
             app->window.refresh();
             app->logger.log("Cardinal spline curve drawn.");
         }
+    }
+    else if (mode == DrawingMode::DrawSmiley) {
+        app->addSmileyFace(position, app->pendingHappyFace);
     }
     else if (mode == DrawingMode::Fill) {
         FillAlgorithmType fillType = app->menu.getFillAlgorithm();
@@ -641,11 +644,15 @@ void Application::handleCommand(int commandId, void* context) {
             break;
 
         case IDM_SMILEY_FACE_HAPPY:
-            app->addSmileyFace(true);
+            app->menu.setMode(DrawingMode::DrawSmiley);
+            app->pendingHappyFace = true;
+            app->logger.log("Happy face mode: click where you want to place the face.");
             break;
 
         case IDM_SMILEY_FACE_SAD:
-            app->addSmileyFace(false);
+            app->menu.setMode(DrawingMode::DrawSmiley);
+            app->pendingHappyFace = false;
+            app->logger.log("Sad face mode: click where you want to place the face.");
             break;
 
         default:
