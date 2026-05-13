@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CORE_ENUMS_H
 #define CORE_ENUMS_H
 

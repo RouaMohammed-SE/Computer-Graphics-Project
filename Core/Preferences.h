@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CORE_PREFERENCES_H
 #define CORE_PREFERENCES_H
 

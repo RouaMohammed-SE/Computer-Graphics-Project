@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UTILS_COLOR_H
 #define UTILS_COLOR_H
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UTILS_LOGGER_H
 #define UTILS_LOGGER_H
 

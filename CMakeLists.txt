@@ -17,7 +17,11 @@ file(GLOB_RECURSE SOURCES
         "Utils/*.cpp"
 )
 
+list(FILTER SOURCES EXCLUDE REGEX "cmake-build-debug/.*")
+
 add_executable(ComputerGraphics WIN32 ${SOURCES})
 
+target_compile_definitions(ComputerGraphics PRIVATE UNICODE _UNICODE)
+
 # Link WinAPI libraries needed by the project
-target_link_libraries(ComputerGraphics comdlg32)
+target_link_libraries(ComputerGraphics comdlg32 gdi32)

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SHAPES_ELLIPSE_H
 #define SHAPES_ELLIPSE_H
 

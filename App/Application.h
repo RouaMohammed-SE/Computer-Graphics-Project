@@ -1,3 +1,4 @@
+#pragma once
 #ifndef APP_APPLICATION_H
 #define APP_APPLICATION_H
 

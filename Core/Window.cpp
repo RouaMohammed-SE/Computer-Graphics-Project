@@ -64,11 +64,63 @@ bool Window::create(const wchar_t* title) {
     AppendMenu(hPrefMenu, MF_POPUP, (UINT_PTR)hCursorMenu, L"Mouse Cursor");
     AppendMenu(hPrefMenu, MF_STRING, IDM_PREF_COLOR, L"Shape Color...");
 
-    // Menu Bar 
+    // Line Menu
+    HMENU hLineMenu = CreatePopupMenu();
+    AppendMenu(hLineMenu, MF_STRING, IDM_DDA_LINE,        L"DDA");
+    AppendMenu(hLineMenu, MF_STRING, IDM_MIDPOINT_LINE,   L"Midpoint");
+    AppendMenu(hLineMenu, MF_STRING, IDM_PARAMETRIC_LINE, L"Parametric");
+
+    // Circle Menu
+    HMENU hCircleMenu = CreatePopupMenu();
+    AppendMenu(hCircleMenu, MF_STRING, IDM_DIRECT_CIRCLE,            L"Direct");
+    AppendMenu(hCircleMenu, MF_STRING, IDM_POLAR_CIRCLE,             L"Polar");
+    AppendMenu(hCircleMenu, MF_STRING, IDM_ITERATIVE_POLAR_CIRCLE,   L"Iterative Polar");
+    AppendMenu(hCircleMenu, MF_STRING, IDM_MIDPOINT_CIRCLE,          L"Midpoint");
+    AppendMenu(hCircleMenu, MF_STRING, IDM_MODIFIED_MIDPOINT_CIRCLE, L"Modified Midpoint");
+
+    // Ellipse Menu
+    HMENU hEllipseMenu = CreatePopupMenu();
+    AppendMenu(hEllipseMenu, MF_STRING, IDM_DIRECT_ELLIPSE,           L"Direct");
+    AppendMenu(hEllipseMenu, MF_STRING, IDM_POLAR_ELLIPSE,            L"Polar");
+    AppendMenu(hEllipseMenu, MF_STRING, IDM_ITERATIVE_POLAR_ELLIPSE,  L"Iterative Polar");
+    AppendMenu(hEllipseMenu, MF_STRING, IDM_MIDPOINT_ELLIPSE,         L"Midpoint");
+
+    // Curves Menu
+    HMENU hCurveMenu = CreatePopupMenu();
+    AppendMenu(hCurveMenu, MF_STRING, IDM_CARDINAL_SPLINE_CURVE, L"Cardinal Spline");
+
+    // Filling Menu
+    HMENU hFillMenu = CreatePopupMenu();
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_CIRCLE_WITH_LINES,              L"Fill Circle with lines");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_CIRCLE_WITH_CIRCLES, L"Fill Circle with circles");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_SQUARE_CURVES,       L"Fill Square with Hermite curves");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_RECTANGLE_CURVES,    L"Fill Rectangle with Bezier curves");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_CONVEX,    L"Convex fill");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_NON_CONVEX,    L"Non-convex fill");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_FLOOD_RECURSIVE,     L"Flood Fill (Recursive)");
+    AppendMenu(hFillMenu, MF_STRING, IDM_FILL_FLOOD_NON_RECURSIVE,  L"Flood Fill (Non-Recursive)");
+
+    // Clipping Menu
+    HMENU hClipMenu = CreatePopupMenu();
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POINT,   L"Rectangle - Point");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_LINE,    L"Rectangle - Line");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POLYGON, L"Rectangle - Polygon");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_SQUARE_POINT,      L"Square - Point");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_SQUARE_LINE,       L"Square - Line");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_CIRCLE_POINT,      L"Circle - Point");
+    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_CIRCLE_LINE,       L"Circle - Line");
+
+    // Menu Bar
     HMENU hMenuBar = CreateMenu();
-    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFileMenu, L"File");
-    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hPrefMenu, L"Preferences");
-    // APPEND YOUR OWN MENUS HERE (LINES, CIRCLES, ETC.)
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFileMenu,    L"File");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hPrefMenu,    L"Preferences");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hLineMenu,    L"Line");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hCircleMenu,  L"Circle");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hEllipseMenu, L"Ellipse");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hCurveMenu,   L"Curves");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFillMenu,    L"Filling");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hClipMenu,    L"Clipping");
+    AppendMenu(hMenuBar, MF_STRING, IDM_SMILEY_FACE,       L"Smiley Face");
 
     // Pass 'this' as lpCreateParams so WM_NCCREATE can store the pointer
     handle = CreateWindowEx(

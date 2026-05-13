@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FILESYSTEM_FILE_MANAGER_H
 #define FILESYSTEM_FILE_MANAGER_H
 

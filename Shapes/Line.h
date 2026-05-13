@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SHAPES_LINE_H
 #define SHAPES_LINE_H
 

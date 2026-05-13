@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UTILS_POINT_H
 #define UTILS_POINT_H
 

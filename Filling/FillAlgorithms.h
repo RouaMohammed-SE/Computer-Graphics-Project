@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FILLING_FILL_ALGORITHMS_H
 #define FILLING_FILL_ALGORITHMS_H
 

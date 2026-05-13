@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ALGORITHMS_LINE_ALGORITHMS_H
 #define ALGORITHMS_LINE_ALGORITHMS_H
 

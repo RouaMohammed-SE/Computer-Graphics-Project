@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "../Menu/MenuCommands.h"
+#include "../Filling/FillAlgorithms.h"
 #include <commdlg.h>
 #include <iostream>
 
@@ -104,83 +105,83 @@ void Application::handleCommand(int commandId, void* context) {
 
     switch (commandId) {
 
-    //File Menu commands
-    case IDM_FILE_CLEAR:
-        // 1a: clear all shapes from the screen
-        app->clearShapes();
-        app->window.clear();
-        app->window.refresh();
-        app->logger.log("Screen cleared.");
-        break;
+        //File Menu commands
+        case IDM_FILE_CLEAR:
+            // 1a: clear all shapes from the screen
+            app->clearShapes();
+            app->window.clear();
+            app->window.refresh();
+            app->logger.log("Screen cleared.");
+            break;
 
-    case IDM_FILE_SAVE: {
-        //1b: save all drawn shapes to a file
-        // Requirement 10: take file path from the console
-        std::string path;
-        std::cout << "[INPUT] Enter file path to save (e.g. drawing.cg): ";
-        std::cin  >> path;
-        app->fileManager.saveShapes(path, app->shapes);
-        break;
-    }
-
-    case IDM_FILE_LOAD: {
-        //1c: load saved shapes from a file
-        std::string path;
-        std::cout << "[INPUT] Enter file path to load: ";
-        std::cin  >> path;
-        app->fileManager.loadShapes(path, app->shapes);
-        app->window.refresh();   // Repaint so loaded shapes appear
-        break;
-    }
-
-    // Preferences Menu commands
-    case IDM_PREF_BG_WHITE:
-        // Assignment 2a: change window background to white
-        app->setBackgroundColor(Color(255, 255, 255));
-        app->window.clear();
-        app->window.refresh();
-        app->logger.log("Background set to white.");
-        break;
-
-    case IDM_PREF_CURSOR_DEFAULT:
-        // 2b: change mouse cursor shape
-        app->preferences.setMouseCursor(MouseCursorType::Default);
-        app->window.setCursor(LoadCursor(NULL, IDC_ARROW));
-        app->logger.log("Cursor: Default.");
-        break;
-
-    case IDM_PREF_CURSOR_CROSSHAIR:
-        app->preferences.setMouseCursor(MouseCursorType::Crosshair);
-        app->window.setCursor(LoadCursor(NULL, IDC_CROSS));
-        app->logger.log("Cursor: Crosshair.");
-        break;
-
-    case IDM_PREF_CURSOR_HAND:
-        app->preferences.setMouseCursor(MouseCursorType::Hand);
-        app->window.setCursor(LoadCursor(NULL, IDC_HAND));
-        app->logger.log("Cursor: Hand.");
-        break;
-
-    case IDM_PREF_COLOR: {
-        // 2c: let the user choose the drawing color from a dialog
-        static COLORREF customColors[16] = {};
-        CHOOSECOLOR cc    = {};
-        cc.lStructSize    = sizeof(cc);
-        cc.hwndOwner      = app->window.getHandle();
-        cc.lpCustColors   = customColors;
-        cc.rgbResult      = RGB(app->drawingColor.r, app->drawingColor.g, app->drawingColor.b);
-        cc.Flags = CC_FULLOPEN | CC_RGBINIT;
-
-        if (ChooseColor(&cc)) {
-            Color chosen(GetRValue(cc.rgbResult), GetGValue(cc.rgbResult), GetBValue(cc.rgbResult));
-            app->setDrawingColor(chosen);
-            app->logger.log("Drawing color updated via color picker.");
+        case IDM_FILE_SAVE: {
+            //1b: save all drawn shapes to a file
+            // Requirement 10: take file path from the console
+            std::string path;
+            std::cout << "[INPUT] Enter file path to save (e.g. drawing.cg): ";
+            std::cin  >> path;
+            app->fileManager.saveShapes(path, app->shapes);
+            break;
         }
-        break;
-    }
 
-    default:
-        // Handle your own custom menu commands here, or log unhandled ones for debugging.
-        break;
+        case IDM_FILE_LOAD: {
+            //1c: load saved shapes from a file
+            std::string path;
+            std::cout << "[INPUT] Enter file path to load: ";
+            std::cin  >> path;
+            app->fileManager.loadShapes(path, app->shapes);
+            app->window.refresh();   // Repaint so loaded shapes appear
+            break;
+        }
+
+        // Preferences Menu commands
+        case IDM_PREF_BG_WHITE:
+            // Assignment 2a: change window background to white
+            app->setBackgroundColor(Color(255, 255, 255));
+            app->window.clear();
+            app->window.refresh();
+            app->logger.log("Background set to white.");
+            break;
+
+        case IDM_PREF_CURSOR_DEFAULT:
+            // 2b: change mouse cursor shape
+            app->preferences.setMouseCursor(MouseCursorType::Default);
+            app->window.setCursor(LoadCursor(NULL, IDC_ARROW));
+            app->logger.log("Cursor: Default.");
+            break;
+
+        case IDM_PREF_CURSOR_CROSSHAIR:
+            app->preferences.setMouseCursor(MouseCursorType::Crosshair);
+            app->window.setCursor(LoadCursor(NULL, IDC_CROSS));
+            app->logger.log("Cursor: Crosshair.");
+            break;
+
+        case IDM_PREF_CURSOR_HAND:
+            app->preferences.setMouseCursor(MouseCursorType::Hand);
+            app->window.setCursor(LoadCursor(NULL, IDC_HAND));
+            app->logger.log("Cursor: Hand.");
+            break;
+
+        case IDM_PREF_COLOR: {
+            // 2c: let the user choose the drawing color from a dialog
+            static COLORREF customColors[16] = {};
+            CHOOSECOLOR cc    = {};
+            cc.lStructSize    = sizeof(cc);
+            cc.hwndOwner      = app->window.getHandle();
+            cc.lpCustColors   = customColors;
+            cc.rgbResult      = RGB(app->drawingColor.r, app->drawingColor.g, app->drawingColor.b);
+            cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+            if (ChooseColor(&cc)) {
+                Color chosen(GetRValue(cc.rgbResult), GetGValue(cc.rgbResult), GetBValue(cc.rgbResult));
+                app->setDrawingColor(chosen);
+                app->logger.log("Drawing color updated via color picker.");
+            }
+            break;
+        }
+
+        default:
+            // Handle your own custom menu commands here, or log unhandled ones for debugging.
+            break;
     }
 }

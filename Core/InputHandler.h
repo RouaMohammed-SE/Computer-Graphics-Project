@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CORE_INPUT_HANDLER_H
 #define CORE_INPUT_HANDLER_H
 

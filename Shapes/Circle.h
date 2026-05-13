@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SHAPES_CIRCLE_H
 #define SHAPES_CIRCLE_H
 
