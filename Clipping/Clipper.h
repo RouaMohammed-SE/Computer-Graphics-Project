@@ -10,6 +10,8 @@ class Clipper {
 public:
     Clipper();
 
+    void quadPointClipping(HDC hdc, Point &topleft , Point &bottomright , Point& point , COLORREF c);
+    void quadLineClipping(HDC hdc, Point &topleft , Point &bottomright , Point& start , Point& end , COLORREF c);
     void clipAgainstRectangle(Shape* shape, const Point& topLeft, const Point& bottomRight);
     void clipAgainstSquare(Shape* shape, const Point& topLeft, int sideLength);
     void clipAgainstCircle(Shape* shape, const Point& center, int radius);
