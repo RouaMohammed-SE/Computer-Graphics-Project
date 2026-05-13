@@ -43,9 +43,12 @@ enum class EllipseAlgorithmType {
 enum class FillAlgorithmType {
     FloodFillRecursive,
     FloodFillNonRecursive,
-    CircleFill,
+    CircleFillWithLines,
+    CircleFillWithCircles,
     RectangleFillWithCurves,
-    SquareFillWithCurves
+    SquareFillWithCurves,
+    ConvexFill,
+    NonConvexFill
 };
 
 // Supported clipping targets.
@@ -53,6 +56,10 @@ enum class ClippingType {
     Rectangle,
     Square,
     Circle
+};
+
+enum class ClipAlgorithmType {
+    PointClip, LineClip, PolygonClip
 };
 
 // Mouse cursor styles available through preferences.

@@ -1,9 +1,18 @@
 #include "Application.h"
 #include "../Menu/MenuCommands.h"
+#include "../Algorithms/LineAlgorithms.h"
+#include "../Algorithms/CircleAlgorithms.h"
+#include "../Algorithms/EllipseAlgorithms.h"
+#include "../Algorithms/CurveAlgorithms.h"
 #include "../Filling/FillAlgorithms.h"
+#include "../Clipping/Clipper.h"
+#include "../Core/Enums.h"
 #include <commdlg.h>
 #include <iostream>
+#include <cmath>
+#include <vector>
 
+using namespace std;
 
 Application::Application()
     : window(800, 600, Color(255, 255, 255)),
@@ -179,6 +188,105 @@ void Application::handleCommand(int commandId, void* context) {
             }
             break;
         }
+
+        // Filling Menu
+        case IDM_FILL_CIRCLE_WITH_LINES:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::CircleFillWithLines);
+            app->logger.log("Fill Circle with lines: click center, then edge.");
+            break;
+
+        case IDM_FILL_CIRCLE_WITH_CIRCLES:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::CircleFillWithCircles);
+            app->logger.log("Fill Circle with circles: click center, inner radius, outer radius.");
+            break;
+
+        case IDM_FILL_RECTANGLE_CURVES:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::RectangleFillWithCurves);
+            app->logger.log("Fill Rectangle with Bezier Curves [Horizontal]: click top-left, then bottom-right.");
+            break;
+
+        case IDM_FILL_SQUARE_CURVES:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::SquareFillWithCurves);
+            app->logger.log("Fill Square with Hermite Curves [Vertical]: click top-left, then any point for side length.");
+            break;
+
+        case IDM_FILL_CONVEX:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::ConvexFill);
+            app->logger.log("Convex Polygon Fill: click inside any Convex Polygon.");
+            break;
+
+        case IDM_FILL_NON_CONVEX:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::NonConvexFill);
+            app->logger.log("Non-Convex Polygon Fill: click inside any Non-Convex Polygon.");
+            break;
+
+        case IDM_FILL_FLOOD_RECURSIVE:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::FloodFillRecursive);
+            app->logger.log("Flood Fill (Recursive): click inside any closed shape.");
+            break;
+
+        case IDM_FILL_FLOOD_NON_RECURSIVE:
+            app->menu.setMode(DrawingMode::Fill);
+            app->menu.setFillAlgorithm(FillAlgorithmType::FloodFillNonRecursive);
+            app->logger.log("Flood Fill (Non-Recursive): click inside any closed shape.");
+            break;
+
+        // Clipping Menu
+        case IDM_CLIPPING_RECTANGLE_POINT:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Rectangle);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::PointClip);
+            app->logger.log("Rectangle-Point Clip: click top-left and bottom-right of window, then the point to be clipped.");
+            break;
+
+        case IDM_CLIPPING_RECTANGLE_LINE:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Rectangle);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::LineClip);
+            app->logger.log("Rectangle-Line Clip: click top-left and bottom-right of window, then line start and end of the line to be clipped.");
+            break;
+
+        case IDM_CLIPPING_RECTANGLE_POLYGON:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Rectangle);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::PolygonClip);
+            app->logger.log("Rectangle-Polygon Clip: click top-left and bottom-right of window, then polygon vertices. Double-click to finish.");
+            break;
+
+        case IDM_CLIPPING_SQUARE_POINT:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Square);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::PointClip);
+            app->logger.log("Square-Point Clip: click top-left and another point for the side length of window, then the point to be clipped.");
+            break;
+
+        case IDM_CLIPPING_SQUARE_LINE:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Square);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::LineClip);
+            app->logger.log("Square-Line Clip: click top-left and another point for the side length of window, then line start and end of the line to be clipped.");
+            break;
+
+        case IDM_CLIPPING_CIRCLE_POINT:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Circle);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::PointClip);
+            app->logger.log("Circle-Point Clip: click center and a point on the boundary of circle window, then the point to be clipped.");
+            break;
+
+        case IDM_CLIPPING_CIRCLE_LINE:
+            app->menu.setMode(DrawingMode::Clip);
+            app->menu.setClippingType(ClippingType::Circle);
+            app->menu.setClipAlgorithm(ClipAlgorithmType::LineClip);
+            app->logger.log("Circle-Line Clip: click center and a point on the boundary of circle window, then line start and end of the line to be clipped.");
+            break;
 
         default:
             // Handle your own custom menu commands here, or log unhandled ones for debugging.

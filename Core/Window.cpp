@@ -35,7 +35,7 @@ Window::Window(int width, int height, const Color& backgroundColor)
       commandContext(nullptr) {}
 
 bool Window::create(const wchar_t* title) { 
-    // Register window class, builds the menu bar, and creats the HWND
+    // Register window class, builds the menu bar, and creates the HWND
     WNDCLASSEX wc   = {};
     wc.cbSize       = sizeof(WNDCLASSEX);
     wc.style        = CS_HREDRAW | CS_VREDRAW;
@@ -101,14 +101,24 @@ bool Window::create(const wchar_t* title) {
     AppendMenu(hFillMenu, MF_STRING, IDM_FILL_FLOOD_NON_RECURSIVE,  L"Flood Fill (Non-Recursive)");
 
     // Clipping Menu
+    HMENU hClipRectMenu = CreatePopupMenu();   // submenu for Rectangle
+    AppendMenu(hClipRectMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POINT,   L"Point");
+    AppendMenu(hClipRectMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_LINE,    L"Line");
+    AppendMenu(hClipRectMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POLYGON, L"Polygon");
+
+    HMENU hClipSquareMenu = CreatePopupMenu();  // submenu for Square
+    AppendMenu(hClipSquareMenu, MF_STRING, IDM_CLIPPING_SQUARE_POINT, L"Point");
+    AppendMenu(hClipSquareMenu, MF_STRING, IDM_CLIPPING_SQUARE_LINE,  L"Line");
+
+    HMENU hClipCircleMenu = CreatePopupMenu();  // submenu for Circle
+    AppendMenu(hClipCircleMenu, MF_STRING, IDM_CLIPPING_CIRCLE_POINT, L"Point");
+    AppendMenu(hClipCircleMenu, MF_STRING, IDM_CLIPPING_CIRCLE_LINE,  L"Line");
+
+    // Parent clipping menu
     HMENU hClipMenu = CreatePopupMenu();
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POINT,   L"Rectangle - Point");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_LINE,    L"Rectangle - Line");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_RECTANGLE_POLYGON, L"Rectangle - Polygon");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_SQUARE_POINT,      L"Square - Point");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_SQUARE_LINE,       L"Square - Line");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_CIRCLE_POINT,      L"Circle - Point");
-    AppendMenu(hClipMenu, MF_STRING, IDM_CLIPPING_CIRCLE_LINE,       L"Circle - Line");
+    AppendMenu(hClipMenu, MF_POPUP, (UINT_PTR)hClipRectMenu,   L"Rectangle");
+    AppendMenu(hClipMenu, MF_POPUP, (UINT_PTR)hClipSquareMenu, L"Square");
+    AppendMenu(hClipMenu, MF_POPUP, (UINT_PTR)hClipCircleMenu, L"Circle");
 
     // Menu Bar
     HMENU hMenuBar = CreateMenu();
@@ -119,14 +129,15 @@ bool Window::create(const wchar_t* title) {
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hEllipseMenu, L"Ellipse");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hCurveMenu,   L"Curves");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFillMenu,    L"Filling");
-    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hClipMenu,    L"Clipping");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hClipMenu, L"Clipping");
     AppendMenu(hMenuBar, MF_STRING, IDM_SMILEY_FACE,       L"Smiley Face");
 
     // Pass 'this' as lpCreateParams so WM_NCCREATE can store the pointer
     handle = CreateWindowEx(
         0, L"CGWindowClass", title,
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, width, height,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        width, height,
         NULL, hMenuBar, instance, this
     );
 
