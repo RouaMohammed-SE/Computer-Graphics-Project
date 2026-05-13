@@ -33,7 +33,8 @@ Application::Application()
       fillQuarter(1),
       pendingHappyFace(true),
       drawingColor(0, 0, 0),
-      backgroundColor(255, 255, 255) {
+      floodFillingColor(255, 0, 0),
+      backgroundColor(255, 255, 255){
     window.setPaintCallback(Application::handlePaint, this);
     window.setMouseClickCallback(Application::handleMouseClick, this);
     window.setMouseMoveCallback(Application::handleMouseMove, this);
@@ -149,6 +150,86 @@ void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& draw
             CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
             Clipper clipper;
             clipper.circleLineClipping(hdc, center, drawing.radius, start, end, color);
+            break;
+        }
+        case PersistentDrawingType::FloodFillRecursive:
+        {
+            Color borderColor(0,0,0);
+
+            FillAlgorithms::floodFillRecursive(
+                hdc,
+                drawing.floodPoint,
+                drawing.floodColor,
+                borderColor
+            );
+            break;
+        }
+        case PersistentDrawingType::FloodFillNonRecursive:
+        {
+            Color borderColor(0,0,0);
+
+            FillAlgorithms::floodFillNonRecursive(
+                hdc,
+                drawing.floodPoint,
+                drawing.floodColor,
+                borderColor
+            );
+            break;
+        }
+        case PersistentDrawingType::ConvexPolygonFill:
+        {
+            for (int i = 0; i < drawing.polygonPoints.size(); i++) {
+                Point p1 = drawing.polygonPoints[i];
+                Point p2 = drawing.polygonPoints[
+                    (i + 1) % drawing.polygonPoints.size()
+                ];
+
+                LineAlgorithms::drawDDA(
+                    hdc,
+                    p1,
+                    p2,
+                    RGB(drawing.color.r,
+                        drawing.color.g,
+                        drawing.color.b)
+                );
+            }
+
+            FillAlgorithms::convexFill(
+                hdc,
+                drawing.polygonPoints,
+                drawing.polygonPoints.size(),
+                RGB(drawing.color.r,
+                    drawing.color.g,
+                    drawing.color.b)
+            );
+            break;
+        }
+        case PersistentDrawingType::NonConvexPolygonFill:
+        {
+            for (int i = 0; i < drawing.polygonPoints.size(); i++) {
+                Point p1 = drawing.polygonPoints[i];
+                Point p2 = drawing.polygonPoints[
+                    (i + 1) % drawing.polygonPoints.size()
+                ];
+
+                LineAlgorithms::drawDDA(
+                    hdc,
+                    p1,
+                    p2,
+                    RGB(drawing.color.r,
+                        drawing.color.g,
+                        drawing.color.b)
+                );
+            }
+
+            FillAlgorithms::nonConvexFill(
+                hdc,
+                drawing.polygonPoints,
+                drawing.polygonPoints.size(),
+                RGB(drawing.color.r,
+                    drawing.color.g,
+                    drawing.color.b)
+            );
             break;
         }
     }
@@ -408,6 +489,95 @@ void Application::handleMouseClick(const Point& position, void* context) {
                 });
                 app->logger.log("Fill Rectangle done.");
                 clickCount = 0;
+            }
+        }
+        else if (fillType == FillAlgorithmType::FloodFillRecursive) {
+            Color borderColor(0, 0, 0);
+            FillAlgorithms::floodFillRecursive(
+            hdc,
+            position,
+            app->floodFillingColor,
+            borderColor
+            );
+
+            PersistentDrawing drawing;
+
+            drawing.type = PersistentDrawingType::FloodFillRecursive;
+            drawing.floodPoint = position;
+            drawing.floodColor = app->floodFillingColor;
+
+            app->persistentDrawings.push_back(drawing);
+            app->logger.log("Flood Fill (Recursive) done.");
+        }
+        else if (fillType == FillAlgorithmType::FloodFillNonRecursive) {
+            Color borderColor(0, 0, 0);
+            FillAlgorithms::floodFillNonRecursive(hdc, position,
+                app->floodFillingColor, borderColor);
+            PersistentDrawing drawing;
+
+            drawing.type = PersistentDrawingType::FloodFillNonRecursive;
+            drawing.floodPoint = position;
+            drawing.floodColor = app->floodFillingColor;
+
+            app->persistentDrawings.push_back(drawing);
+            app->logger.log("Flood Fill (Non-Recursive) done.");
+        }
+        else if (fillType == FillAlgorithmType::ConvexFill) {
+            static std::vector<Point> convexPoints;
+            convexPoints.push_back(position);
+            SetPixel(hdc, position.x, position.y, color);
+            if (convexPoints.size() > 1) {
+                const Point& prev = convexPoints[convexPoints.size() - 2];
+                LineAlgorithms::drawDDA(hdc, prev, position, color);
+            }
+            app->logger.log("Convex polygon vertex added. Re-click last point to finish.");
+
+            int n = convexPoints.size();
+            if (n >= 3) {
+                const Point& last       = convexPoints[n - 1];
+                const Point& secondLast = convexPoints[n - 2];
+                if (last.x == secondLast.x && last.y == secondLast.y) {
+                    convexPoints.pop_back();
+                    int sz = convexPoints.size();
+                    FillAlgorithms::convexFill(hdc, convexPoints, sz, color);
+                    PersistentDrawing drawing;
+                    drawing.type = PersistentDrawingType::ConvexPolygonFill;
+                    drawing.polygonPoints = convexPoints;
+                    drawing.color = app->drawingColor;
+
+                    app->persistentDrawings.push_back(drawing);
+                    app->logger.log("Convex Fill done.");
+                    convexPoints.clear();
+                }
+            }
+        }
+        else if (fillType == FillAlgorithmType::NonConvexFill) {
+            static std::vector<Point> nonConvexPoints;
+            nonConvexPoints.push_back(position);
+            SetPixel(hdc, position.x, position.y, color);
+            if (nonConvexPoints.size() > 1) {
+                const Point& prev = nonConvexPoints[nonConvexPoints.size() - 2];
+                LineAlgorithms::drawDDA(hdc, prev, position, color);
+            }
+            app->logger.log("Non-Convex polygon vertex added. Re-click last point to finish.");
+
+            int n = nonConvexPoints.size();
+            if (n >= 3) {
+                const Point& last       = nonConvexPoints[n - 1];
+                const Point& secondLast = nonConvexPoints[n - 2];
+                if (last.x == secondLast.x && last.y == secondLast.y) {
+                    nonConvexPoints.pop_back();
+                    int sz = nonConvexPoints.size();
+                    FillAlgorithms::nonConvexFill(hdc, nonConvexPoints, sz, color);
+                    PersistentDrawing drawing;
+                    drawing.type = PersistentDrawingType::NonConvexPolygonFill;
+                    drawing.polygonPoints = nonConvexPoints;
+                    drawing.color = app->drawingColor;
+
+                    app->persistentDrawings.push_back(drawing);
+                    app->logger.log("Non-Convex Fill done.");
+                    nonConvexPoints.clear();
+                }
             }
         }
     }
@@ -901,12 +1071,24 @@ void Application::handleCommand(int commandId, void* context) {
         case IDM_FILL_FLOOD_RECURSIVE:
             app->menu.setMode(DrawingMode::Fill);
             app->menu.setFillAlgorithm(FillAlgorithmType::FloodFillRecursive);
+        {
+            int r, g, b;
+            std::cout << "[INPUT] Enter filling color R G B (e.g. 0 0 0 for black): ";
+            std::cin >> r >> g >> b;
+            app->floodFillingColor = Color(r, g, b);
+        }
             app->logger.log("Flood Fill (Recursive): click inside any closed shape.");
             break;
 
         case IDM_FILL_FLOOD_NON_RECURSIVE:
             app->menu.setMode(DrawingMode::Fill);
             app->menu.setFillAlgorithm(FillAlgorithmType::FloodFillNonRecursive);
+        {
+            int r, g, b;
+            std::cout << "[INPUT] Enter filling color R G B (e.g. 0 0 0 for black): ";
+            std::cin >> r >> g >> b;
+            app->floodFillingColor = Color(r, g, b);
+        }
             app->logger.log("Flood Fill (Non-Recursive): click inside any closed shape.");
             break;
 

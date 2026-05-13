@@ -189,7 +189,7 @@ void FillAlgorithms::fillSquareWithCurves(HDC hdc, const Point& topLeft, int sid
     }
 }
 
-void FillAlgorithms::convexFill(HDC hdc,Point p[],int n,COLORREF color){
+void FillAlgorithms::convexFill(HDC hdc,vector<Point> p,int n,COLORREF color){
     Entry *table = new Entry[MAXENTRIES];
 
     InitEntries(table);
@@ -204,8 +204,9 @@ void FillAlgorithms::convexFill(HDC hdc,Point p[],int n,COLORREF color){
     delete [] table;
 }
 
-void FillAlgorithms::nonConvexFill(HDC hdc, Point *polygon, int n, COLORREF c){
+void FillAlgorithms::nonConvexFill(HDC hdc, vector<Point> p, int n, COLORREF c){
     auto *table = new EdgeList [MAXENTRIES];
+    Point *polygon = p.data();
     InitEdgeTable(polygon, n, table);
 
     int y = 0;

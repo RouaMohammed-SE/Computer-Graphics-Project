@@ -5,6 +5,8 @@
 #include "../Utils/Color.h"
 #include "../Utils/Point.h"
 #include <windows.h>
+#include <vector>
+using namespace std;
 
 // Groups area filling algorithm entry points.
 class FillAlgorithms {
@@ -25,8 +27,8 @@ public:
         const Color& endColor);
     static void fillRectangleWithCurves(HDC hdc, const Point& topLeft, const Point& bottomRight, COLORREF fillColor);
     static void fillSquareWithCurves(HDC hdc, const Point& topLeft, int sideLength, COLORREF fillColor);
-    static void convexFill(HDC hdc,Point p[],int n,COLORREF color);
-    static void nonConvexFill(HDC hdc, Point *polygon, int n, COLORREF c);
+    static void convexFill(HDC hdc,vector<Point> p,int n, COLORREF color);
+    static void nonConvexFill(HDC hdc, vector<Point> p, int n, COLORREF c);
 };
 
 #endif

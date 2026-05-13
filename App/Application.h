@@ -20,7 +20,11 @@ enum class PersistentDrawingType {
     RectangleFillWithCurves,
     SquareFillWithCurves,
     CircleClipPoint,
-    CircleClipLine
+    CircleClipLine,
+    FloodFillRecursive,
+    FloodFillNonRecursive,
+    ConvexPolygonFill,
+    NonConvexPolygonFill
 };
 
 struct PersistentDrawing {
@@ -32,6 +36,10 @@ struct PersistentDrawing {
     int quarter;
     int sideLength;
     Color color;
+
+    std::vector<Point> polygonPoints;
+    Point floodPoint;
+    Color floodColor;
 };
 
 // Main controller that coordinates window, input, menu, files, and shapes.
@@ -77,6 +85,7 @@ private:
     bool pendingHappyFace;
     Color drawingColor;
     Color backgroundColor;
+    Color floodFillingColor;
 };
 
 #endif
