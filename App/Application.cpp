@@ -9,6 +9,7 @@
 #include "../Core/Enums.h"
 #include "../Shapes/Circle.h"
 #include "../Shapes/Curve.h"
+#include "../Shapes/Ellipse.h"
 #include "../Shapes/Line.h"
 #include <commdlg.h>
 #include <iostream>
@@ -25,6 +26,7 @@ Application::Application()
       preferences(),
       logger(),
       shapes(),
+      pendingClicks(),
       drawingColor(0, 0, 0),
       backgroundColor(255, 255, 255) {
     window.setPaintCallback(Application::handlePaint, this);
@@ -93,6 +95,10 @@ void Application::setBackgroundColor(const Color& color) {
     window.setBackgroundColor(color);
 }
 
+void Application::resetPendingClicks() {
+    pendingClicks.clear();
+}
+
 void Application::addSmileyFace(bool happy) {
     const Color faceColor = drawingColor;
     const Point center(400, 280);
@@ -145,16 +151,75 @@ void Application::handleMouseClick(const Point& position, void* context) {
     COLORREF color = RGB(app->drawingColor.r, app->drawingColor.g, app->drawingColor.b);
 
     if (mode == DrawingMode::DrawLine) {
-
+        app->pendingClicks.push_back(position);
+        if (app->pendingClicks.size() == 1) {
+            app->logger.log("Line start set. Click line end.");
+        } else if (app->pendingClicks.size() == 2) {
+            app->addShape(new Line(
+                app->pendingClicks[0],
+                app->pendingClicks[1],
+                app->menu.getLineAlgorithm(),
+                app->drawingColor));
+            app->resetPendingClicks();
+            app->window.refresh();
+            app->logger.log("Line drawn.");
+        }
     }
     else if (mode == DrawingMode::DrawCircle) {
+        app->pendingClicks.push_back(position);
+        if (app->pendingClicks.size() == 1) {
+            app->logger.log("Circle center set. Click a boundary point.");
+        } else if (app->pendingClicks.size() == 2) {
+            const Point& center = app->pendingClicks[0];
+            const Point& boundary = app->pendingClicks[1];
+            int dx = boundary.x - center.x;
+            int dy = boundary.y - center.y;
+            int radius = static_cast<int>(std::round(std::sqrt(dx * dx + dy * dy)));
 
+            app->addShape(new Circle(
+                center,
+                radius,
+                app->menu.getCircleAlgorithm(),
+                app->drawingColor));
+            app->resetPendingClicks();
+            app->window.refresh();
+            app->logger.log("Circle drawn.");
+        }
     }
     else if (mode == DrawingMode::DrawEllipse) {
+        app->pendingClicks.push_back(position);
+        if (app->pendingClicks.size() == 1) {
+            app->logger.log("Ellipse center set. Click a point for horizontal radius.");
+        } else if (app->pendingClicks.size() == 2) {
+            app->logger.log("Ellipse horizontal radius set. Click a point for vertical radius.");
+        } else if (app->pendingClicks.size() == 3) {
+            const Point& center = app->pendingClicks[0];
+            const Point& radiusXPoint = app->pendingClicks[1];
+            const Point& radiusYPoint = app->pendingClicks[2];
+            int radiusX = std::abs(radiusXPoint.x - center.x);
+            int radiusY = std::abs(radiusYPoint.y - center.y);
 
+            app->addShape(new MyEllipse(
+                center,
+                radiusX,
+                radiusY,
+                app->menu.getEllipseAlgorithm(),
+                app->drawingColor));
+            app->resetPendingClicks();
+            app->window.refresh();
+            app->logger.log("Ellipse drawn.");
+        }
     }
     else if (mode == DrawingMode::DrawCurve) {
-
+        app->pendingClicks.push_back(position);
+        if (app->pendingClicks.size() < 4) {
+            app->logger.log("Curve control point set. Click until 4 points are selected.");
+        } else {
+            app->addShape(new Curve(app->pendingClicks, 0.5, app->drawingColor));
+            app->resetPendingClicks();
+            app->window.refresh();
+            app->logger.log("Cardinal spline curve drawn.");
+        }
     }
     else if (mode == DrawingMode::Fill) {
         FillAlgorithmType fillType = app->menu.getFillAlgorithm();
@@ -257,6 +322,7 @@ void Application::handleMouseMove(const Point& position, void* context) {
 
 void Application::handleCommand(int commandId, void* context) {
     Application* app = static_cast<Application*>(context);
+    app->resetPendingClicks();
 
     switch (commandId) {
 

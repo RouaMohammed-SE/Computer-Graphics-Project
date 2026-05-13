@@ -1,4 +1,11 @@
 #include "Ellipse.h"
+#include "../Algorithms/EllipseAlgorithms.h"
+
+namespace {
+COLORREF toColorRef(const Color& color) {
+    return RGB(color.r, color.g, color.b);
+}
+}
 
 MyEllipse::MyEllipse()
     : Shape(), center(), radiusX(0), radiusY(0), algorithm(EllipseAlgorithmType::Midpoint) {
@@ -11,7 +18,20 @@ MyEllipse::MyEllipse(const Point& center, int radiusX, int radiusY, EllipseAlgor
 }
 
 void MyEllipse::draw(HDC hdc) {
-    // TODO: Call selected ellipse drawing algorithm using the provided WinAPI HDC.
+    switch (algorithm) {
+    case EllipseAlgorithmType::Direct:
+        EllipseAlgorithms::drawDirect(hdc, center, radiusX, radiusY, toColorRef(color));
+        break;
+    case EllipseAlgorithmType::Polar:
+        EllipseAlgorithms::drawPolar(hdc, center, radiusX, radiusY, toColorRef(color));
+        break;
+    case EllipseAlgorithmType::IterativePolar:
+        EllipseAlgorithms::drawIterativePolar(hdc, center, radiusX, radiusY, toColorRef(color));
+        break;
+    case EllipseAlgorithmType::Midpoint:
+        EllipseAlgorithms::drawMidpoint(hdc, center, radiusX, radiusY, toColorRef(color));
+        break;
+    }
 }
 
 // Returns a text representation of the ellipse for saving to a file.

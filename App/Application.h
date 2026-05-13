@@ -38,6 +38,7 @@ private:
     static void handleCommand    (int commandId, void* context);
 
     void addSmileyFace(bool happy);
+    void resetPendingClicks();
 
     Window window;
     InputHandler inputHandler;
@@ -47,6 +48,7 @@ private:
     Logger logger;
 
     std::vector<Shape*> shapes;
+    std::vector<Point> pendingClicks;
     Color drawingColor;
     Color backgroundColor;
 };
