@@ -1,6 +1,9 @@
 #include "FillAlgorithms.h"
 #include <algorithm>
 #include <cmath>
+#include <queue>
+
+using namespace std;
 
 FillAlgorithms::FillAlgorithms() {
     // TODO: Add initialization logic if needed.
@@ -98,7 +101,29 @@ void FillAlgorithms::floodFillRecursive(HDC hdc, const Point& start, const Color
 }
 
 void FillAlgorithms::floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor) {
-    // TODO: Implement non-recursive flood fill.
+    int x = start.x , y = start.y;
+    COLORREF startColor = GetPixel(hdc, x, y);
+    COLORREF fillRef = toColorRef(fillColor);
+    COLORREF borderRef = toColorRef(borderColor);
+
+    if (startColor == borderRef || startColor == fillRef) return;
+
+    queue<Point>q;
+    q.push({x,y});
+
+    while(!q.empty()){
+        Point p = q.front();
+        q.pop();
+
+        COLORREF c = GetPixel(hdc , p.x , p.y);
+
+        if(c == borderRef || c == fillRef) continue;
+        SetPixel(hdc , p.x , p.y , fillRef);
+        q.push({p.x-1,p.y});
+        q.push({p.x+1,p.y});
+        q.push({p.x,p.y-1});
+        q.push({p.x,p.y+1});
+    }
 }
 
 void FillAlgorithms::fillCircle(HDC hdc, const Point& center, int radius, const Color& fillColor) {
