@@ -14,10 +14,12 @@ union outcode{
     unsigned all:4;
 };
 
+// line clipping helpers
 outcode getCode(Point p1);
 void intersect(Point& p, Point p1, Point p2, int edge);
 bool cohensuth(Point& p1, Point& p2);
 
+// polygon clipping helpers
 bool insideLeft  (Point p, double e) { return p.x >= e; }
 bool insideRight (Point p, double e) { return p.x <= e; }
 bool insideBottom(Point p, double e) { return p.y >= e; }
