@@ -14,6 +14,26 @@
 #include <windows.h>
 #include <vector>
 
+enum class PersistentDrawingType {
+    CircleFillWithLines,
+    CircleFillWithCircles,
+    RectangleFillWithCurves,
+    SquareFillWithCurves,
+    CircleClipPoint,
+    CircleClipLine
+};
+
+struct PersistentDrawing {
+    PersistentDrawingType type;
+    std::vector<Point> points;
+    int radius;
+    int innerRadius;
+    int outerRadius;
+    int quarter;
+    int sideLength;
+    Color color;
+};
+
 // Main controller that coordinates window, input, menu, files, and shapes.
 class Application {
 public:
@@ -39,6 +59,7 @@ private:
 
     void addSmileyFace(const Point& center, bool happy);
     void resetPendingClicks();
+    void replayPersistentDrawing(HDC hdc, const PersistentDrawing& drawing);
 
     Window window;
     InputHandler inputHandler;
@@ -48,6 +69,7 @@ private:
     Logger logger;
 
     std::vector<Shape*> shapes;
+    std::vector<PersistentDrawing> persistentDrawings;
     std::vector<Point> pendingClicks;
     int fillQuarter;
     bool pendingHappyFace;

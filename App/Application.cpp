@@ -26,6 +26,7 @@ Application::Application()
       preferences(),
       logger(),
       shapes(),
+      persistentDrawings(),
       pendingClicks(),
       fillQuarter(1),
       pendingHappyFace(true),
@@ -71,6 +72,9 @@ void Application::render(HDC hdc) {
     for (Shape* shape : shapes) {
         shape->draw(hdc);
     }
+    for (const PersistentDrawing& drawing : persistentDrawings) {
+        replayPersistentDrawing(hdc, drawing);
+    }
 }
 
 void Application::addShape(Shape* shape) {
@@ -83,6 +87,7 @@ void Application::clearShapes() {
         delete shape;
     }
     shapes.clear();
+    persistentDrawings.clear();
     logger.log("Cleared all shapes.");
 }
 
@@ -99,6 +104,50 @@ void Application::setBackgroundColor(const Color& color) {
 
 void Application::resetPendingClicks() {
     pendingClicks.clear();
+}
+
+void Application::replayPersistentDrawing(HDC hdc, const PersistentDrawing& drawing) {
+    COLORREF color = RGB(drawing.color.r, drawing.color.g, drawing.color.b);
+    switch (drawing.type) {
+    case PersistentDrawingType::CircleFillWithLines:
+        CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.radius, color);
+        FillAlgorithms::fillCircleWithLines(hdc, drawing.points[0], drawing.radius, drawing.quarter, drawing.color);
+        break;
+    case PersistentDrawingType::CircleFillWithCircles:
+        CircleAlgorithms::drawMidpoint(hdc, drawing.points[0], drawing.outerRadius, color);
+        FillAlgorithms::fillCircleWithCircles(
+            hdc,
+            drawing.points[0],
+            drawing.innerRadius,
+            drawing.outerRadius,
+            drawing.quarter,
+            drawing.color,
+            drawing.color);
+        break;
+    case PersistentDrawingType::RectangleFillWithCurves:
+        FillAlgorithms::fillRectangleWithCurves(hdc, drawing.points[0], drawing.points[1], color);
+        break;
+    case PersistentDrawingType::SquareFillWithCurves:
+        FillAlgorithms::fillSquareWithCurves(hdc, drawing.points[0], drawing.sideLength, color);
+        break;
+    case PersistentDrawingType::CircleClipPoint: {
+        Point center = drawing.points[0];
+        Point point = drawing.points[1];
+        CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
+        Clipper clipper;
+        clipper.circlePointClipping(hdc, center, drawing.radius, point, color);
+        break;
+    }
+    case PersistentDrawingType::CircleClipLine: {
+        Point center = drawing.points[0];
+        Point start = drawing.points[1];
+        Point end = drawing.points[2];
+        CircleAlgorithms::drawMidpoint(hdc, center, drawing.radius, RGB(0, 0, 0));
+        Clipper clipper;
+        clipper.circleLineClipping(hdc, center, drawing.radius, start, end, color);
+        break;
+    }
+    }
 }
 
 void Application::addSmileyFace(const Point& center, bool happy) {
@@ -240,6 +289,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
 
                 CircleAlgorithms::drawMidpoint(hdc, center, radius, color);
                 FillAlgorithms::fillCircleWithLines(hdc, center, radius, app->fillQuarter, app->drawingColor);
+                app->persistentDrawings.push_back({
+                    PersistentDrawingType::CircleFillWithLines,
+                    {center},
+                    radius,
+                    0,
+                    0,
+                    app->fillQuarter,
+                    0,
+                    app->drawingColor
+                });
                 app->resetPendingClicks();
                 app->logger.log("Fill Circle with lines done.");
             }
@@ -270,6 +329,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
                     app->fillQuarter,
                     app->drawingColor,
                     app->drawingColor);
+                app->persistentDrawings.push_back({
+                    PersistentDrawingType::CircleFillWithCircles,
+                    {center},
+                    0,
+                    innerRadius,
+                    outerRadius,
+                    app->fillQuarter,
+                    0,
+                    app->drawingColor
+                });
                 app->resetPendingClicks();
                 app->logger.log("Fill Circle with circles done.");
             }
@@ -286,6 +355,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
             else {
                 int side = sqrt((topLeft.x-position.x) * (topLeft.x-position.x) + (topLeft.y-position.y) * (topLeft.y-position.y));
                 FillAlgorithms::fillSquareWithCurves(hdc, topLeft, side, color);
+                app->persistentDrawings.push_back({
+                    PersistentDrawingType::SquareFillWithCurves,
+                    {topLeft},
+                    0,
+                    0,
+                    0,
+                    0,
+                    side,
+                    app->drawingColor
+                });
                 app->logger.log("Fill Square done.");
                 clickCount = 0;
             }
@@ -301,6 +380,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
             }
             else {
                 FillAlgorithms::fillRectangleWithCurves(hdc, topLeft, position, color);
+                app->persistentDrawings.push_back({
+                    PersistentDrawingType::RectangleFillWithCurves,
+                    {topLeft, position},
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    app->drawingColor
+                });
                 app->logger.log("Fill Rectangle done.");
                 clickCount = 0;
             }
@@ -341,6 +430,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
             else if (clickCount == 2) {
                 if (clipAlgo == ClipAlgorithmType::PointClip) {
                     clipper.circlePointClipping(hdc, center, radius, const_cast<Point&>(position), color);
+                    app->persistentDrawings.push_back({
+                        PersistentDrawingType::CircleClipPoint,
+                        {center, position},
+                        radius,
+                        0,
+                        0,
+                        0,
+                        0,
+                        app->drawingColor
+                    });
                     app->logger.log("Circle-Point clipping done.");
                     clickCount = 2; // allow user to enter point again
                 }
@@ -353,6 +452,16 @@ void Application::handleMouseClick(const Point& position, void* context) {
             else if (clickCount == 3) {
                 lineP2 = position;
                 clipper.circleLineClipping(hdc, center, radius, lineP1, lineP2, color);
+                app->persistentDrawings.push_back({
+                    PersistentDrawingType::CircleClipLine,
+                    {center, lineP1, lineP2},
+                    radius,
+                    0,
+                    0,
+                    0,
+                    0,
+                    app->drawingColor
+                });
                 clickCount = 2; // allow user to enter line again
             }
         }
