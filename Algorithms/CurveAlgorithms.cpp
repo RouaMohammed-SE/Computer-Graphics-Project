@@ -9,7 +9,17 @@ CurveAlgorithms::CurveAlgorithms() {
     // TODO: Add initialization logic if needed.
 }
 
-void hermiteCurve(HDC hdc, const Point& p1, const Point& s1, const Point& p2, const Point& s2, COLORREF color) {
+void CurveAlgorithms::bezierCurve(HDC hdc, Point& p1, Point& p2, Point& p3, Point& p4, COLORREF color) {
+    for (double t = 0; t < 1; t += 0.0001) {
+        double tt = (1-t);
+        double a0 = tt*tt*tt, a1 = tt*tt*3*t, a2 = tt*3*t*t, a3 = t*t*t;
+        int x = round(a0*p1.x + a1*p2.x + a2*p3.x + a3*p4.x);
+        int y = round(a0*p1.y + a1*p2.y + a2*p3.y + a3*p4.y);
+        SetPixel(hdc, x, y, color);
+    }
+}
+
+void CurveAlgorithms::hermiteCurve(HDC hdc, const Point& p1, const Point& s1, const Point& p2, const Point& s2, COLORREF color) {
     int H[][4] = {{2, 1, -2, 1}, {-3, -2, 3, -1}, {0, 1, 0, 0}, {1, 0, 0, 0}};
     int a3 = H[0][0]*p1.x + H[0][1]*s1.x + H[0][2]*p2.x + H[0][3]*s2.x;
     int a2 = H[1][0]*p1.x + H[1][1]*s1.x + H[1][2]*p2.x + H[1][3]*s2.x;

@@ -11,6 +11,8 @@ class CurveAlgorithms {
 public:
     CurveAlgorithms();
 
+    static void bezierCurve(HDC hdc, Point& p1, Point& p2, Point& p3, Point& p4, COLORREF color);
+    static void hermiteCurve(HDC hdc, const Point& p1, const Point& s1, const Point& p2, const Point& s2, COLORREF color);
     static void drawCardinalSpline(HDC hdc, const std::vector<Point>& points, double tension, COLORREF color);
 };
 
