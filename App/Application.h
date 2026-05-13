@@ -49,6 +49,7 @@ private:
 
     std::vector<Shape*> shapes;
     std::vector<Point> pendingClicks;
+    int fillQuarter;
     Color drawingColor;
     Color backgroundColor;
 };

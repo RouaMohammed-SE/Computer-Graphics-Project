@@ -14,6 +14,7 @@ public:
     static void floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor);
     static void floodFillNonRecursive(HDC hdc, const Point& start, const Color& fillColor, const Color& borderColor);
     static void fillCircle(HDC hdc, const Point& center, int radius, const Color& fillColor);
+    static void fillCircleWithLines(HDC hdc, const Point& center, int radius, int quarter, const Color& fillColor);
     static void fillCircleWithCircles(
         HDC hdc,
         const Point& center,

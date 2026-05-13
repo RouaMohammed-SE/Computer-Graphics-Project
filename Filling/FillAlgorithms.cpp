@@ -1,4 +1,5 @@
 #include "FillAlgorithms.h"
+#include "../Algorithms/LineAlgorithms.h"
 #include <algorithm>
 #include <cmath>
 #include <queue>
@@ -16,6 +17,8 @@ namespace {
     void drawQuarterPoints(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color);
 
     void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, COLORREF color);
+
+    void drawQuarterLines(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color);
 }
 
 // -----------------------------------------------
@@ -62,6 +65,36 @@ void FillAlgorithms::floodFillNonRecursive(HDC hdc, const Point& start, const Co
 
 void FillAlgorithms::fillCircle(HDC hdc, const Point& center, int radius, const Color& fillColor) {
     fillCircleWithCircles(hdc, center, 0, radius, 0, fillColor, fillColor);
+}
+
+void FillAlgorithms::fillCircleWithLines(HDC hdc, const Point& center, int radius, int quarter, const Color& fillColor) {
+    if (!hdc || radius < 0) {
+        return;
+    }
+
+    COLORREF color = toColorRef(fillColor);
+    int x = 0;
+    int y = radius;
+    int decision = 1 - radius;
+    int changeEast = 3;
+    int changeSouthEast = 5 - 2 * radius;
+
+    drawQuarterLines(hdc, center, x, y, quarter, color);
+
+    while (x < y) {
+        if (decision < 0) {
+            decision += changeEast;
+            changeSouthEast += 2;
+        } else {
+            decision += changeSouthEast;
+            changeSouthEast += 4;
+            --y;
+        }
+
+        changeEast += 2;
+        ++x;
+        drawQuarterLines(hdc, center, x, y, quarter, color);
+    }
 }
 
 void FillAlgorithms::fillCircleWithCircles(HDC hdc, const Point& center, int innerRadius, int outerRadius, int quarter, const Color& startColor, const Color& endColor) {
@@ -230,6 +263,37 @@ namespace {
             ++x;
 
             drawQuarterPoints(hdc, center, x, y, quarter, color);
+        }
+    }
+
+    void drawQuarterLines(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color) {
+        switch (quarter) {
+            case 1:
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + x, center.y - y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + y, center.y - x), color);
+                break;
+            case 2:
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - x, center.y - y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - y, center.y - x), color);
+                break;
+            case 3:
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - x, center.y + y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - y, center.y + x), color);
+                break;
+            case 4:
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + x, center.y + y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + y, center.y + x), color);
+                break;
+            default:
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + x, center.y + y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - x, center.y + y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + x, center.y - y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - x, center.y - y), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + y, center.y + x), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - y, center.y + x), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x + y, center.y - x), color);
+                LineAlgorithms::drawDDA(hdc, center, Point(center.x - y, center.y - x), color);
+                break;
         }
     }
 }

@@ -27,6 +27,7 @@ Application::Application()
       logger(),
       shapes(),
       pendingClicks(),
+      fillQuarter(1),
       drawingColor(0, 0, 0),
       backgroundColor(255, 255, 255) {
     window.setPaintCallback(Application::handlePaint, this);
@@ -223,7 +224,54 @@ void Application::handleMouseClick(const Point& position, void* context) {
     }
     else if (mode == DrawingMode::Fill) {
         FillAlgorithmType fillType = app->menu.getFillAlgorithm();
-        if (fillType == FillAlgorithmType::SquareFillWithCurves) {
+        if (fillType == FillAlgorithmType::CircleFillWithLines) {
+            app->pendingClicks.push_back(position);
+            if (app->pendingClicks.size() == 1) {
+                app->logger.log("Fill Circle with lines: center set. Click a boundary point.");
+            } else if (app->pendingClicks.size() == 2) {
+                const Point& center = app->pendingClicks[0];
+                const Point& boundary = app->pendingClicks[1];
+                int dx = boundary.x - center.x;
+                int dy = boundary.y - center.y;
+                int radius = static_cast<int>(std::round(std::sqrt(dx * dx + dy * dy)));
+
+                CircleAlgorithms::drawMidpoint(hdc, center, radius, color);
+                FillAlgorithms::fillCircleWithLines(hdc, center, radius, app->fillQuarter, app->drawingColor);
+                app->resetPendingClicks();
+                app->logger.log("Fill Circle with lines done.");
+            }
+        }
+        else if (fillType == FillAlgorithmType::CircleFillWithCircles) {
+            app->pendingClicks.push_back(position);
+            if (app->pendingClicks.size() == 1) {
+                app->logger.log("Fill Circle with circles: center set. Click inner radius point.");
+            } else if (app->pendingClicks.size() == 2) {
+                app->logger.log("Inner radius set. Click outer radius point.");
+            } else if (app->pendingClicks.size() == 3) {
+                const Point& center = app->pendingClicks[0];
+                const Point& innerPoint = app->pendingClicks[1];
+                const Point& outerPoint = app->pendingClicks[2];
+                int innerDx = innerPoint.x - center.x;
+                int innerDy = innerPoint.y - center.y;
+                int outerDx = outerPoint.x - center.x;
+                int outerDy = outerPoint.y - center.y;
+                int innerRadius = static_cast<int>(std::round(std::sqrt(innerDx * innerDx + innerDy * innerDy)));
+                int outerRadius = static_cast<int>(std::round(std::sqrt(outerDx * outerDx + outerDy * outerDy)));
+
+                CircleAlgorithms::drawMidpoint(hdc, center, outerRadius, color);
+                FillAlgorithms::fillCircleWithCircles(
+                    hdc,
+                    center,
+                    innerRadius,
+                    outerRadius,
+                    app->fillQuarter,
+                    app->drawingColor,
+                    app->drawingColor);
+                app->resetPendingClicks();
+                app->logger.log("Fill Circle with circles done.");
+            }
+        }
+        else if (fillType == FillAlgorithmType::SquareFillWithCurves) {
             static int clickCount = 0;
             static Point topLeft;
 
@@ -486,12 +534,24 @@ void Application::handleCommand(int commandId, void* context) {
         case IDM_FILL_CIRCLE_WITH_LINES:
             app->menu.setMode(DrawingMode::Fill);
             app->menu.setFillAlgorithm(FillAlgorithmType::CircleFillWithLines);
+            std::cout << "[INPUT] Choose filling quarter (1 upper-right, 2 upper-left, 3 lower-left, 4 lower-right): ";
+            std::cin >> app->fillQuarter;
+            if (app->fillQuarter < 1 || app->fillQuarter > 4) {
+                app->fillQuarter = 1;
+                app->logger.log("Invalid quarter. Using quarter 1.");
+            }
             app->logger.log("Fill Circle with lines: click center, then edge.");
             break;
 
         case IDM_FILL_CIRCLE_WITH_CIRCLES:
             app->menu.setMode(DrawingMode::Fill);
             app->menu.setFillAlgorithm(FillAlgorithmType::CircleFillWithCircles);
+            std::cout << "[INPUT] Choose filling quarter (1 upper-right, 2 upper-left, 3 lower-left, 4 lower-right): ";
+            std::cin >> app->fillQuarter;
+            if (app->fillQuarter < 1 || app->fillQuarter > 4) {
+                app->fillQuarter = 1;
+                app->logger.log("Invalid quarter. Using quarter 1.");
+            }
             app->logger.log("Fill Circle with circles: click center, inner radius, outer radius.");
             break;
 
