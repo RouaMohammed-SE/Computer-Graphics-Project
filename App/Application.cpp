@@ -589,7 +589,7 @@ void Application::handleMouseClick(const Point& position, void* context) {
         ClipAlgorithmType clipAlgo = app->menu.getClipAlgorithm();
         COLORREF clipColor = RGB(0, 0, 0);
 
-        if (clipType == ClippingType::Rectangle) {
+         if (clipType == ClippingType::Rectangle) {
             static int clickCount = 0;
             static Point topLeft, bottomRight, lineP1, lineP2;
             static std::vector<Point> polygonPoints;
@@ -746,7 +746,7 @@ void Application::handleMouseClick(const Point& position, void* context) {
                         app->drawingColor
                     });
                     app->logger.log("Circle-Point clipping done.");
-                    clickCount = 2; // allow user to enter point again
+                    clickCount = 0;
                 }
                 else if (clipAlgo == ClipAlgorithmType::LineClip) {
                     lineP1 = position;
@@ -772,7 +772,6 @@ void Application::handleMouseClick(const Point& position, void* context) {
         }
 
     }
-    app->window.refresh();
     ReleaseDC(app->window.getHandle(), hdc);
     app->update();
 }
