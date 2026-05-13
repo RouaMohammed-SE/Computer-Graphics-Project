@@ -104,19 +104,33 @@ void Clipper::circlePointClipping(HDC hdc, Point &center, int radius, Point &poi
 }
 
 void Clipper::circleLineClipping(HDC hdc, Point &center, int radius, Point &point1, Point &point2, COLORREF c) {
-    Point p1, p2, start(-1,-1), end(-1, -1);
-    p1.x = point1.x, p1.y = point1.y;
-    p2.x = point2.x, p2.y = point2.y;
+    Point p1 = point1, p2 = point2;
 
     if (p1.x > p2.x) {
-        if (p1.x > p2.x) {
-            Point temp = p1;
-            p1 = p2;
-            p2 = temp;
-        }
+        Point temp = p1;
+        p1 = p2;
+        p2 = temp;
     }
 
-    int dx = p1.x - p2.x, dy = p1.y - p2.y;
+    int dx = p2.x - p1.x, dy = p2.y - p1.y;
+
+    // Vertical line
+    if (dx == 0){
+        int yStart = min(p1.y, p2.y);
+        int yEnd = max(p1.y, p2.y);
+
+        for (int y = yStart; y <= yEnd; y++){
+            int dx1 = p1.x - center.x;
+            int dy1 = y - center.y;
+
+            if (dx1 * dx1 + dy1 * dy1 <= radius * radius)
+            {
+                SetPixel(hdc, p1.x, y, c);
+            }
+        }
+        return;
+    }
+
     if (abs(dx) > abs(dy)) {
         int x = p1.x;
         double y = p1.y, m = (double) dy / dx;
@@ -130,27 +144,20 @@ void Clipper::circleLineClipping(HDC hdc, Point &center, int radius, Point &poin
         }
     }
     else {
+        if (p1.y > p2.y) {
+            Point temp = p1;
+            p1 = p2;
+            p2 = temp;
+        }
         double x = p1.x, m = (double) dx / dy;
         int y = p1.y;
-        if (p1.y < p2.y) {
-            while (y < p2.y) {
-                int dx1 = x - center.x, dy1 = round(y) - center.y;
-                if ((dx1 * dx1 + dy1 * dy1) <= (radius * radius)) {
-                    SetPixel(hdc, round(x), y, c);
-                }
-                y++;
-                x += m;
+        while (y < p2.y) {
+            int dx1 = x - center.x, dy1 = round(y) - center.y;
+            if ((dx1 * dx1 + dy1 * dy1) <= (radius * radius)) {
+                SetPixel(hdc, round(x), y, c);
             }
-        }
-        else {
-            while (y > p2.y) {
-                int dx1 = x - center.x, dy1 = round(y) - center.y;
-                if ((dx1 * dx1 + dy1 * dy1) <= (radius * radius)) {
-                    SetPixel(hdc, round(x), y, c);
-                }
-                y--;
-                x += m;
-            }
+            y++;
+            x += m;
         }
     }
 }
