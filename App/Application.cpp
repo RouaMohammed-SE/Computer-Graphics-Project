@@ -321,8 +321,10 @@ void Application::handleMouseClick(const Point& position, void* context) {
                     innerRadius,
                     outerRadius,
                     app->fillQuarter,
-                    app->drawingColor,
-                    app->drawingColor);
+                    app->drawingColor,              // start: user's chosen color
+                    Color(255 - app->drawingColor.r,
+                        255 - app->drawingColor.g,
+                        255 - app->drawingColor.b)); // end: inverted color
                 app->persistentDrawings.push_back({
                     PersistentDrawingType::CircleFillWithCircles,
                     {center},
