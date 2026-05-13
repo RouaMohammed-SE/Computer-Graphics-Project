@@ -5,86 +5,20 @@
 
 using namespace std;
 
-FillAlgorithms::FillAlgorithms() {
-    // TODO: Add initialization logic if needed.
-}
-
+//------------- Helpers definition ---------------
 namespace {
-COLORREF toColorRef(const Color& color) {
-    return RGB(color.r, color.g, color.b);
+    COLORREF toColorRef(const Color& color);
+
+    Color lerpColor(const Color& startColor, const Color& endColor, double t);
+
+    void drawThickPixel(HDC hdc, int x, int y, COLORREF color);
+
+    void drawQuarterPoints(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color);
+
+    void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, COLORREF color);
 }
 
-Color lerpColor(const Color& startColor, const Color& endColor, double t) {
-    return Color(
-        static_cast<int>(startColor.r + (endColor.r - startColor.r) * t),
-        static_cast<int>(startColor.g + (endColor.g - startColor.g) * t),
-        static_cast<int>(startColor.b + (endColor.b - startColor.b) * t));
-}
-
-void drawThickPixel(HDC hdc, int x, int y, COLORREF color) {
-    SetPixel(hdc, x, y, color);
-    SetPixel(hdc, x + 1, y, color);
-    SetPixel(hdc, x, y + 1, color);
-    SetPixel(hdc, x + 1, y + 1, color);
-}
-
-void drawQuarterPoints(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color) {
-    switch (quarter) {
-    case 1:
-        drawThickPixel(hdc, center.x + x, center.y - y, color);
-        drawThickPixel(hdc, center.x + y, center.y - x, color);
-        break;
-    case 2:
-        drawThickPixel(hdc, center.x - x, center.y - y, color);
-        drawThickPixel(hdc, center.x - y, center.y - x, color);
-        break;
-    case 3:
-        drawThickPixel(hdc, center.x - x, center.y + y, color);
-        drawThickPixel(hdc, center.x - y, center.y + x, color);
-        break;
-    case 4:
-        drawThickPixel(hdc, center.x + x, center.y + y, color);
-        drawThickPixel(hdc, center.x + y, center.y + x, color);
-        break;
-    default:
-        drawThickPixel(hdc, center.x + x, center.y + y, color);
-        drawThickPixel(hdc, center.x - x, center.y + y, color);
-        drawThickPixel(hdc, center.x + x, center.y - y, color);
-        drawThickPixel(hdc, center.x - x, center.y - y, color);
-        drawThickPixel(hdc, center.x + y, center.y + x, color);
-        drawThickPixel(hdc, center.x - y, center.y + x, color);
-        drawThickPixel(hdc, center.x + y, center.y - x, color);
-        drawThickPixel(hdc, center.x - y, center.y - x, color);
-        break;
-    }
-}
-
-void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, COLORREF color) {
-    int x = 0;
-    int y = radius;
-    int decision = 1 - radius;
-    int changeEast = 3;
-    int changeSouthEast = 5 - 2 * radius;
-
-    drawQuarterPoints(hdc, center, x, y, quarter, color);
-
-    while (x < y) {
-        if (decision < 0) {
-            decision += changeEast;
-            changeSouthEast += 2;
-        } else {
-            decision += changeSouthEast;
-            changeSouthEast += 4;
-            --y;
-        }
-
-        changeEast += 2;
-        ++x;
-
-        drawQuarterPoints(hdc, center, x, y, quarter, color);
-    }
-}
-}
+// -----------------------------------------------
 
 void FillAlgorithms::floodFillRecursive(HDC hdc, const Point& start, const Color& fillColor , const Color& borderColor) {
     int x = start.x , y = start.y;
@@ -130,14 +64,7 @@ void FillAlgorithms::fillCircle(HDC hdc, const Point& center, int radius, const 
     fillCircleWithCircles(hdc, center, 0, radius, 0, fillColor, fillColor);
 }
 
-void FillAlgorithms::fillCircleWithCircles(
-    HDC hdc,
-    const Point& center,
-    int innerRadius,
-    int outerRadius,
-    int quarter,
-    const Color& startColor,
-    const Color& endColor) {
+void FillAlgorithms::fillCircleWithCircles(HDC hdc, const Point& center, int innerRadius, int outerRadius, int quarter, const Color& startColor, const Color& endColor) {
     if (!hdc) {
         return;
     }
@@ -225,5 +152,84 @@ void FillAlgorithms::fillSquareWithCurves(HDC hdc, const Point& topLeft, int sid
         Point s1(wave, tangentMag), s2(wave, tangentMag);
 
         hermiteCurve1(hdc, p1, s1, p2, s2, fillColor);
+    }
+}
+
+//------------- Helpers Implementation ---------------
+
+namespace {
+    COLORREF toColorRef(const Color& color) {
+        return RGB(color.r, color.g, color.b);
+    }
+
+    Color lerpColor(const Color& startColor, const Color& endColor, double t) {
+        return Color(
+            static_cast<int>(startColor.r + (endColor.r - startColor.r) * t),
+            static_cast<int>(startColor.g + (endColor.g - startColor.g) * t),
+            static_cast<int>(startColor.b + (endColor.b - startColor.b) * t));
+    }
+
+    void drawThickPixel(HDC hdc, int x, int y, COLORREF color) {
+        SetPixel(hdc, x, y, color);
+        SetPixel(hdc, x + 1, y, color);
+        SetPixel(hdc, x, y + 1, color);
+        SetPixel(hdc, x + 1, y + 1, color);
+    }
+
+    void drawQuarterPoints(HDC hdc, const Point& center, int x, int y, int quarter, COLORREF color) {
+        switch (quarter) {
+            case 1:
+                drawThickPixel(hdc, center.x + x, center.y - y, color);
+                drawThickPixel(hdc, center.x + y, center.y - x, color);
+                break;
+            case 2:
+                drawThickPixel(hdc, center.x - x, center.y - y, color);
+                drawThickPixel(hdc, center.x - y, center.y - x, color);
+                break;
+            case 3:
+                drawThickPixel(hdc, center.x - x, center.y + y, color);
+                drawThickPixel(hdc, center.x - y, center.y + x, color);
+                break;
+            case 4:
+                drawThickPixel(hdc, center.x + x, center.y + y, color);
+                drawThickPixel(hdc, center.x + y, center.y + x, color);
+                break;
+            default:
+                drawThickPixel(hdc, center.x + x, center.y + y, color);
+                drawThickPixel(hdc, center.x - x, center.y + y, color);
+                drawThickPixel(hdc, center.x + x, center.y - y, color);
+                drawThickPixel(hdc, center.x - x, center.y - y, color);
+                drawThickPixel(hdc, center.x + y, center.y + x, color);
+                drawThickPixel(hdc, center.x - y, center.y + x, color);
+                drawThickPixel(hdc, center.x + y, center.y - x, color);
+                drawThickPixel(hdc, center.x - y, center.y - x, color);
+                break;
+        }
+    }
+
+    void drawBresenhamCircle(HDC hdc, const Point& center, int radius, int quarter, COLORREF color) {
+        int x = 0;
+        int y = radius;
+        int decision = 1 - radius;
+        int changeEast = 3;
+        int changeSouthEast = 5 - 2 * radius;
+
+        drawQuarterPoints(hdc, center, x, y, quarter, color);
+
+        while (x < y) {
+            if (decision < 0) {
+                decision += changeEast;
+                changeSouthEast += 2;
+            } else {
+                decision += changeSouthEast;
+                changeSouthEast += 4;
+                --y;
+            }
+
+            changeEast += 2;
+            ++x;
+
+            drawQuarterPoints(hdc, center, x, y, quarter, color);
+        }
     }
 }
