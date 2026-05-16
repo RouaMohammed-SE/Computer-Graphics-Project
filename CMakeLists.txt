@@ -19,7 +19,8 @@ file(GLOB_RECURSE SOURCES
 
 list(FILTER SOURCES EXCLUDE REGEX "cmake-build-debug/.*")
 
-add_executable(ComputerGraphics WIN32 ${SOURCES})
+add_executable(ComputerGraphics WIN32 ${SOURCES}
+        FillingCircles.cpp)
 
 target_compile_definitions(ComputerGraphics PRIVATE UNICODE _UNICODE)
 

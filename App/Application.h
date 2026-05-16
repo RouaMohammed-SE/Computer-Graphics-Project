@@ -13,6 +13,7 @@
 #include "../Utils/Point.h"
 #include <windows.h>
 #include <vector>
+#include <string>
 
 enum class PersistentDrawingType {
     CircleFillWithLines,
@@ -65,30 +66,37 @@ public:
     Color getDrawingColor() const { return drawingColor; }
 
 private:
+    // --- Callbacks registered with Window ---
     static void handlePaint(HDC hdc, void* context);
     static void handleMouseClick(const Point& position, void* context);
     static void handleMouseMove(const Point& position, void* context);
     static void handleRightClick(const Point& position, void* context);
-    // Called by Window whenever a menu item is clicked (WM_COMMAND)
-    static void handleCommand    (int commandId, void* context);
+    static void handleCommand(int commandId, void* context);
 
+    // --- Canvas HWND subclass (captures mouse on canvas child window) ---
+    static LRESULT CALLBACK canvasProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp, UINT_PTR uid, DWORD_PTR data);
+
+    // --- Helpers ---
     void addSmileyFace(const Point& center, bool happy);
     void resetPendingClicks();
     void replayPersistentDrawing(HDC hdc, const PersistentDrawing& drawing);
     void drawPendingClickMarkers(HDC hdc);
+    void updateStatusMode(const std::wstring& mode, const std::wstring& algo = L"");
 
-    Window window;
+    // --- Members ---
+    Window      window;
     InputHandler inputHandler;
-    Menu menu;
+    Menu        menu;
     FileManager fileManager;
     Preferences preferences;
-    Logger logger;
+    Logger      logger;
 
-    std::vector<Shape*> shapes;
+    std::vector<Shape*>          shapes;
     std::vector<PersistentDrawing> persistentDrawings;
-    std::vector<Point> pendingClicks;
-    int fillQuarter;
-    bool pendingHappyFace;
+    std::vector<Point>           pendingClicks;
+
+    int   fillQuarter;
+    bool  pendingHappyFace;
     Color drawingColor;
     Color backgroundColor;
     Color floodFillingColor;

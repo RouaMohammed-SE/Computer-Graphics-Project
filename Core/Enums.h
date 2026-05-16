@@ -71,4 +71,10 @@ enum class MouseCursorType {
     Hand
 };
 
+// UI theme: dark or light.
+enum class ThemeMode {
+    Dark,
+    Light
+};
+
 #endif

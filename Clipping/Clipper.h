@@ -18,8 +18,8 @@ public:
     void rectanglePolygonClipping(HDC hdc , Point& topleft , Point& bottomright , vector<Point>& P);
     void squarePointClipping(HDC hdc, Point &topleft , int sideLength, Point& point , COLORREF c);
     void squareLineClipping(HDC hdc, Point &topleft , int sideLength , Point& start , Point& end , COLORREF c);
-    void circlePointClipping(HDC hdc, Point &center, int radius, Point &point, COLORREF c);
-    void circleLineClipping(HDC hdc, Point &center, int radius, Point &point1, Point &point2, COLORREF c);
+    void circlePointClipping(HDC hdc, Point center, int radius, Point point, COLORREF c);
+    void circleLineClipping(HDC hdc, Point center, int radius, Point point1, Point point2, COLORREF c);
 };
 
 #endif

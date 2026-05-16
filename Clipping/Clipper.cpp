@@ -95,7 +95,7 @@ void Clipper::squareLineClipping(HDC hdc, Point &topleft , int sideLength , Poin
     rectangleLineClipping(hdc , topleft , bottomright ,start , end, c);
 }
 
-void Clipper::circlePointClipping(HDC hdc, Point &center, int radius, Point &point, COLORREF c) {
+void Clipper::circlePointClipping(HDC hdc, Point center, int radius, Point point, COLORREF c) {
     int dx = point.x - center.x;
     int dy = point.y - center.y;
     if ((dx * dx + dy * dy) <= (radius * radius)) {
@@ -103,7 +103,7 @@ void Clipper::circlePointClipping(HDC hdc, Point &center, int radius, Point &poi
     }
 }
 
-void Clipper::circleLineClipping(HDC hdc, Point &center, int radius, Point &point1, Point &point2, COLORREF c) {
+void Clipper::circleLineClipping(HDC hdc, Point center, int radius, Point point1, Point point2, COLORREF c) {
     Point p1 = point1, p2 = point2;
 
     if (p1.x > p2.x) {
