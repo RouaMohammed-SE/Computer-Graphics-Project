@@ -91,3 +91,11 @@ All features are accessible from the **menu bar** at the top of the window:
 3. For clipping and filling operations, follow the on-screen flow: define the clipping region first, then the shape or point.
 4. Use **File → Save / Load** to persist your drawing.
 5. Use **Preferences** to change drawing color, background color, or cursor style.
+
+---
+
+## Authors
+- **Malak Reda Mohamed**: [GitHub](https://github.com/malakreda-905) - [LinkedIn](https://www.linkedin.com/in/malakreda)
+- **Mennat-Allah Abdallah**: [GitHub](https://github.com/menna226) - [LinkedIn](https://www.linkedin.com/in/mennat-allah-abdallah-530987312)
+- **Roaa Mohamed Sayed**: [GitHub](https://github.com/RouaMohammed-SE) - [LinkedIn](https://www.linkedin.com/in/rouamohammed)
+- **Salsabil Bahaa Eldin Rohaiem**: [GitHub](https://github.com/salsabilbahaa) - [LinkedIn](https://www.linkedin.com/in/salsabil-bahaaeldin)
