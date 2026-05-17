@@ -63,7 +63,7 @@ void Application::run() {
     logger.log("Application started.");
     logger.log("Use the sidebar on the left to select drawing tools.");
 
-    if (!window.create(L"Draw Studio")) {
+    if (!window.create(L"Drawing App")) {
         logger.error("Failed to create window.");
         return;
     }

@@ -497,7 +497,7 @@ void Window::paintToolbar(HDC hdc, HWND hwnd) {
     HFONT oldF = (HFONT)SelectObject(hdc, bigFont);
     SetTextColor(hdc, tc.accent);
     SetBkMode(hdc, TRANSPARENT);
-    DrawTextW(hdc, L"DRAW STUDIO", -1, &titleR, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    DrawTextW(hdc, L"Drawing App", -1, &titleR, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     SelectObject(hdc, oldF);
     DeleteObject(bigFont);
 

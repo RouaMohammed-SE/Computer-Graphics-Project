@@ -17,7 +17,7 @@ file(GLOB_RECURSE SOURCES
         "Utils/*.cpp"
 )
 
-list(FILTER SOURCES EXCLUDE REGEX "cmake-build-debug/.*")
+list(FILTER SOURCES EXCLUDE REGEX "cmake-build-.*/.*")
 
 add_executable(ComputerGraphics WIN32 ${SOURCES}
         FillingCircles.cpp)
